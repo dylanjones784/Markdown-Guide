@@ -1,0 +1,40 @@
+Could put the overview in here. Have the sum up, with all the links to those sections in the main guide.
+
+How would i link text to the sections in the guide markdown template?
+
+
+
+### Introduction
+This is a best practice guide. I got my research primarily from existing guides and research, as well as security practices recommended by official bodies. Following an amalgamation of all these best practices allows developers to create APIs that not only adhere to the REST architype, but are also …
+Simple, Consistent, Easy To Use, Adaptable , Efficient, Effective, Self-explanatory. This isn’t a do or don’t, this is amalgamation of standards that as a developer, you should follow, to promote those keywords.
+We will be using keywords that should be interpreted as described in BCP 14, RFC2119, RFC8174. These are "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL”.
+We will first discuss the design principles and ideologies that should be considered during conception, and the best practices and standards established for creating a REST API. This guide imitates the lifecycle of a Web API, from the conception and design phase and what should be considered, to the actual development and creation of the API following best practices and standards set by various authority bodies and companies.
+Definitions
+All acronyms in here. Will need to get a list when its done 
+URI, HTTP, API ,Rest, URI, URL, HTTPS, JWT, JSON 
+Overview of Sections
+Key takeaways from each section. 
+It should be known that it isn’t possible to follow all these conventions, and to expect so is ridiculous, most REST APIs fall into Level 2 rather than 3, and that’s fine. This guide stands to act as a collaborative effort between developers to solidify the commonly accepted practices and standards into a singular area where it can continue to be worked on, as well as to continue help developers when creating REST APIs.
+Representational State Transfer, better known as REST, is an architecture style for enabling communications between computer systems on the web. The principles it is based upon promote a
+Uses open standards, can be implemented in a flexible manner and doesn’t conform the client or the developer to strict frameworks.
+Resource Design - They key characteristic of this approach is that we emphasis the resources over the functionality, and with exposing large numbers of resources that are accessible with a limited number of methods reduces potential confusion and complexity further down the lifecycle. To see more on Accepted HTTP Methods, visit <AcceptedMethodsLink>.
+Decoupled server and client communications
+Stateless communication n what it is..
+Hypermedia distributed systems, link to the last bit
+Resources hierarchy, why we have them and how keeping a simplistic approach can help scaling up as well as managing the complexity of the API. Look, we are developers, the more complex it gets, the less likely it is we are to look at it.
+(example of a resource and a identifier)
+When a user interacts with a resource, with a URI, the response will have a status code and 
+(show JSON)
+Access Control strengthens security and…Different methods can be employed to do this, such as decoupling the admin and regular network activity APIs, limit specific IP (read doc..). Mention each heading and examples? I want a bit on this as a layer of my work was on OWASP
+The Richardson Maturity Model was developed to test how adherent to REST Principles the API is and that achieving level 3 means it’s the best it can be.
+Level 3, Hypermedia, what it is and how a it works
+Caching
+Layered Hierarchical System, Resource Oreitned Design approach basically.
+Handling responses and what to return if and when
+Show examples
+Filtering Data 
+Error Handling
+
+
+
+
