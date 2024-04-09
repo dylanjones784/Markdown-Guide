@@ -1,40 +1,3 @@
-### Introduction
-This is a best practice guide. I got my research primarily from existing guides and research, as well as security practices recommended by official bodies. Following an amalgamation of all these best practices allows developers to create APIs that not only adhere to the REST architype, but are also …
-Simple, Consistent, Easy To Use, Adaptable , Efficient, Effective, Self-explanatory. This isn’t a do or don’t, this is amalgamation of standards that as a developer, you should follow, to promote those keywords.
-We will be using keywords that should be interpreted as described in BCP 14, RFC2119, RFC8174. These are "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL”.
-We will first discuss the design principles and ideologies that should be considered during conception, and the best practices and standards established for creating a REST API. This guide imitates the lifecycle of a Web API, from the conception and design phase and what should be considered, to the actual development and creation of the API following best practices and standards set by various authority bodies and companies.
-Definitions
-All acronyms in here. Will need to get a list when its done 
-URI, HTTP, API ,Rest, URI, URL, HTTPS, JWT, JSON 
-Overview of Sections
-Key takeaways from each section. 
-It should be known that it isn’t possible to follow all these conventions, and to expect so is ridiculous, most REST APIs fall into Level 2 rather than 3, and that’s fine. This guide stands to act as a collaborative effort between developers to solidify the commonly accepted practices and standards into a singular area where it can continue to be worked on, as well as to continue help developers when creating REST APIs.
-Representational State Transfer, better known as REST, is an architecture style for enabling communications between computer systems on the web. The principles it is based upon promote a
-Uses open standards, can be implemented in a flexible manner and doesn’t conform the client or the developer to strict frameworks.
-Resource Design - They key characteristic of this approach is that we emphasis the resources over the functionality, and with exposing large numbers of resources that are accessible with a limited number of methods reduces potential confusion and complexity further down the lifecycle. To see more on Accepted HTTP Methods, visit <AcceptedMethodsLink>.
-Decoupled server and client communications
-Stateless communication n what it is..
-Hypermedia distributed systems, link to the last bit
-Resources hierarchy, why we have them and how keeping a simplistic approach can help scaling up as well as managing the complexity of the API. Look, we are developers, the more complex it gets, the less likely it is we are to look at it.
-(example of a resource and a identifier)
-When a user interacts with a resource, with a URI, the response will have a status code and 
-(show JSON)
-Access Control strengthens security and…Different methods can be employed to do this, such as decoupling the admin and regular network activity APIs, limit specific IP (read doc..). Mention each heading and examples? I want a bit on this as a layer of my work was on OWASP
-The Richardson Maturity Model was developed to test how adherent to REST Principles the API is and that achieving level 3 means it’s the best it can be.
-Level 3, Hypermedia, what it is and how a it works
-Caching
-Layered Hierarchical System, Resource Oreitned Design approach basically.
-Handling responses and what to return if and when
-Show examples
-Filtering Data 
-Error Handling
-
-
-
-
-
-
-
 # Design Background
 The main principle of this design guide is not to cage in developers in rigorous frameworks, but to bring together commonly used best practices and standards that, if adhered to, will produce an API that is consistent, simple, and effective. 
 
@@ -254,8 +217,6 @@ RESTful APIs that utilise HTTP should ensure that idempotent methods cause no si
 
 
 
-
-
 # Content Types
 Content Types are the agreed upon format between a client and server on how data should be returned. For example, a GET request may return data in a JSON or XML format. The request will contain a header that specifies the formats that are acceptable, this is referred to as “media types”.
 
@@ -273,9 +234,6 @@ Number	Double
 Text	String
 
 Why do we need to standardize them?
-
-
-
 
 
 
@@ -300,7 +258,6 @@ Luckily, there are multiple methods and avenues a developer should follow when i
 
 
 
-
 # Avoiding Chatty APIs
 Chatty APIs are those which expose a large number of small resources, requiring the client to make multiple requests to get all the data they need. We want to avoid situations these situations, ensuring that the system is not slowed down by numerous I/O operations. 
 Here is an example of what a Chatty API may look like. 
@@ -312,16 +269,6 @@ Additionally, data can be included.
 It is a double-edged blade in all honesty. We want to return exactly what they want to provide the details for them to discover the functionality that is related to the resource. HATEOAS can help this, for you can expose related functionality without them having to make further requests.
 Example of what a Chatty API would have (basically endpoints)
 Example of collating resources so that we don’t expose a large number 
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -348,9 +295,6 @@ Before using a custom method to achieve functionality, developers should ensure 
 
 
 
-
-
-
 # Providing HATEOAS Navigation
 Hypermedia as the Engine of Application State, or HATEOAS, has been discussed briefly in previous sections of this guide but not discussed in detail. Here, I will establish what HATEOAS is, why should we implement it and how it works. 
 It is an integral principle for RESTful APIs as it enables clients to understand and discover the functionality available to them on a given resource.
@@ -362,14 +306,6 @@ A08 Software and Data Integrity Failures - OWASP Top 10:2021
 API6:2023 Unrestricted Access to Sensitive Business Flows - OWASP API Security Top 10
 Example of how you should expose your business flows. Links into resource oriented design and how a resource-oriented API 
 Example of how to avoid it
-
-
-
-
-
-
-
-
 
 
 
@@ -412,16 +348,6 @@ Value	Indicator	Meaning
 The web API must return messages that contain the correct HTTP status code so that the client can determine how next to handle the result if needed. 
 
 Example of error code when a function is FORBIDDEN access. Example of bad request. Example of a resource that has moved and indicating where it has gone.
-
-
-
-
-
-
-
-
-
-
 
 
 # Handling Large Requests and Responses
@@ -477,7 +403,7 @@ APIs should adopt a data retention policy, and a suitable “undelete” functio
 During the data retention window, users must be able to undelete their data without any data loss. 
 To find more information on this topic, especially the legality side, visit <hyperlink>https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/data-protection-principles/a-guide-to-the-data-protection-principles/the-principles/storage-limitation/#:~:text=The%20UK%20GDPR%20does%20not%20dictate%20how%20long%20you%20should,how%20long%20you%20need%20it.
 
-Long Running Operation Response
+# Long Running Operation Response
 Sometimes a user’s request can take longer than expected to handle and process correctly, to which the API may return a response to the client that states that the operation is in process. 
 Long Running Operations through REST :: Oracle Health Insurance Product Definition (3.21.2)
 Common design patterns  |  Cloud APIs  |  Google Cloud
@@ -501,28 +427,13 @@ Common design patterns  |  Cloud APIs  |  Google Cloud
 Would talk about content type being established as well as caching
 Principle of REST and why its good.
 
-Supporting Client-Side Caching
+## Supporting Client-Side Caching
 Supporting requests that can enable caching
 Caching and optimising client side data access to the API 
 Sensitive data should not be cached.
 
-E-Tags
+## E-Tags
 Etags to optimise query
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # Versioning
 Versioning comes as the API evolves over time and how it may be required to make changes that could potentially break existing client usage. With versioning, we can introduce these changes whilst maintaining compatibility with the older versions. 
@@ -538,16 +449,22 @@ No versioning means that client applications will continue to function as intend
 If more radical changes are made to an API, such as removing fields or renaming them, the relationship between the resources will have changed and can possibly interrupt a client’s usage.
 Due to this, this method may not be the best fit. The following approaches may be more suitable in this situation.
 
-Versioning through the URI 
+## Versioning through the URI 
 The URI for each resource exposed will include a version indicator of the API. For example, if we wanted to make a request to the 2.0 version of the book API, a request would look like this:
+
 Example of the URI having the versioning. Response.
+
 URIs from previous versions must still be usable by the client, which does mean that we must violate the principle of having each URI refer to a unique resource.
+
 Example of the URI from a prior version.
-The previous URIs should return the resource that is the same as their original schema.
+
+The previous URIs should return the resource that is the same as their original schema
+
 Example of the response body that matches the old schema.
+
 As you can probably see, this can get quite cumbersome and complicated as the API grows and evolves. HATEOAS would be complex to implement as each link would also have to include the version number.
 
-Versioning through a Custom Request Header
+## Versioning through a Custom Request Header
 An easier, more consistent method of versioning the API is to include the API version indicator in the request headers. This method avoids the complexity of including the version for resources across the versions.
 Example of the request with the Version 1
 
@@ -555,10 +472,11 @@ Example of the request with the Version 2
 
 This method does require the client applications to add the header to all requests.
 If the API version is not included, a status code of 400 and an apt message describing the issue must be returned to the client. 
-Deprecating Functionality
+## Deprecating Functionality
 It has been stated before that as API functionality evolves and grows, changes may be made to functionality that break existing client applications. Developers should avoid disrupting client interactions, however sometimes this is not possible. 
 Old functionality may be deprecated if a major overhaul or change has been made to the inner workings of the system, and we may not want clients to use the old functionality anymore as it is less secure or not as efficient. It is up to the developer to alert the client that the service is going to be deprecated, and to provide a date or indication of when they should expect this functionality to stop working.
 Let us say we deprecate the service which allows clients to rent a book through the book keeping API. The client may be unaware of this, and will send a request to API with the relevant URI:
+
 Example of request
 If the functionality is still available, but is going to be deprecated in a weeks’ time, the response may look like:
 Example of response and its status code.
@@ -580,13 +498,13 @@ Additionally, developers should be removing unused dependencies and libraries th
 
 
 
-Open API Specification
+# Open API Specification
 The Open API Initiative was created by industry experts who recognised the need of standardising how APIs are described, and that having a language-agnostic interface allows for both humans and computers to discover and understand the full capabilities of an API without access to the source code.  Although some aspects of this guide have taken influence from the Open API initiative, it requires developers to adhere to a stricter framework and set of standards that it must contain for it to be considered Open API adherent.
 To find out more on the specification, visit <hyperlink https://spec.openapis.org/oas/latest.html>
 
 
 
 
-Licensing
+# Licensing
 Free to use and what license this falls under as it is an amalgamation of others work + other creative commons licensed work.
 
