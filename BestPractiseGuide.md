@@ -1,12 +1,6 @@
 # Hello! I am a header
 
 
-How do i link to other sections? Are other sections going to be individual markdown templates?
-
-How do i want to structure it?
-
-Going to need to learn how to put images. Hyperlinks. Sublists.
-Tables.
 
 ## Header 2
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. In orci justo, tincidunt a nunc nec, tincidunt varius arcu. Praesent quam est, dictum vel magna eget, volutpat imperdiet metus. Sed sodales egestas enim. Nullam tempor varius ultricies. Suspendisse ligula ex, auctor et ipsum at, sagittis eleifend leo. Donec id velit elementum, aliquam nibh id, faucibus tortor. Ut risus risus, molestie et vehicula ac, vulputate sit amet nunc. Suspendisse iaculis consequat congue. Sed elementum, felis sit amet feugiat mollis, nisi tellus dignissim risus, at scelerisque enim magna non ligula.
