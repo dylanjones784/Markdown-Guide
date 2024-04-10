@@ -32,3 +32,36 @@ following my designs.
 
 
 Any extension taht I can look at?
+
+
+--From HTTP 
+RESTful APIs must return messages that match the correct HTTP status code for that requests state. If a POST request has been successful, a status code of 201 (Created) should be returned, or if a DELETE request has been successful,
+
+Developers should provide sufficient context for privileged users to fix their query, whilst also not giving too much information so that the user can figure out the inner functionality of the system without prior access.
+
+
+
+**EXAMPLE**
+ of a type of message that should be returned and what should not be returned when a bad request/something fails occurs. 
+
+**EXAMPLE**
+ of code.
+
+
+
+
+# Request and Responses
+The API would accept the request, verify its header contents / data itself, then would either reply by returning the specific object requested (if get), created object if post, updated object if put, deleted if delete. 
+We want to make sure the requests are verified and that they match the system, and that these requests can also support pagination, filtering and parametrisations.
+Why do we have these ones? Not only to ensure our communications are secure, but also to ensure that clients requests and usability of the API is rest adherent, as well as featuring the common standards and practices expected by various industry standards.
+
+Adopting the right strategy prior to the implementation of a REST API ensures that the client 
+
+
+---
+This is the old platform indepdence para - could put it in overview?
+
+It is often the case that developers can lose sight of who and how users are interacting with their API. Any client, no matter on what device, should be able to communicate with the API through standard HTTP protocols regardless of how it was implemented internally. 
+
+There should be a mechanism within so that a format of data can be agreed on by both client and server.
+Another key aspect that should be considered for allowing any client to interact with the API is to ensure that new functionality, when added, does not impede on old functionality. 

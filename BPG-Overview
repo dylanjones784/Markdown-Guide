@@ -23,6 +23,7 @@ Here I will sum up the entire guide
 Key takeaways from each section.
 
 Key takeaways from each section. 
+
 It should be known that it isn’t possible to follow all these conventions, and to expect so is ridiculous, most REST APIs fall into Level 2 rather than 3, and that’s fine. This guide stands to act as a collaborative effort between developers to solidify the commonly accepted practices and standards into a singular area where it can continue to be worked on, as well as to continue help developers when creating REST APIs.
 Representational State Transfer, better known as REST, is an architecture style for enabling communications between computer systems on the web. The principles it is based upon promote a
 Uses open standards, can be implemented in a flexible manner and doesn’t conform the client or the developer to strict frameworks.
