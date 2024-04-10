@@ -67,9 +67,8 @@ Developers should adopt a consistent naming convention for URIs that follows the
 -  An HTTP GET request would be the verb.
 
 The following URI represents the collection of books available. 
-<example>
+**EXAMPLE**
 https://bpglibrary-official.com/books 
-</example>
 
 HTTP GET requests to this collection URI would retrieve a list of book objects that are available in the database. Each book in that collection would have its own unique URI, that the client can use HTTP GET request on to return the details of that book.  
 
@@ -99,35 +98,16 @@ As stated in <hyperlink to Resource Hierarchy>, the relationships of resources a
 For example, the client has made a GET request to retrieve a specific book from the API, the response body should also contain links to extra functionality that can be done on that resource.
 
 
-<example>
+**EXAMPLE**
+
 GET https://bpglibrary-official.com/books/24 
 ACCEPT: text/JSON
-</example>
 
 **URL Pattern**
 ```text
 https://.../<resource-collection>/<resource-id>:<action>?<input parameters>
 ```
-<response example>
 
-200 OK
-Content-Type: application/json; charset…
-Content-Length:…
-{
-“bookID” : 24,
-“title”:”Big Book of Knowledge”,
-“author”: “Peter Jackson”,
-“pubDate”:16/04/2012,
-“availability”: “Available”,
-“links”: [
-    {
-    “href”: “ ”,
-    “link”: “ ”,
-“rel”: “ ”
-}
-]
-}
-</example>
 
 ```json
 	200 OK
@@ -197,12 +177,14 @@ TLS will encrypt the data, authenticate the request to ensure that the client is
 
 On the Presentation Layers that allow for users to enter their own data for submission to the API, for example a sign-up form or to change an accounts detail, the front-end must be sanitised and validated so that no Injection styled attack can be used. Sanitisation is the practice of taking a users input and validating it so that any unsafe characters, i.e. escape characters in SQL, are removed before being transmitted.
 
-Example of SQL injection attack.
+**EXAMPLE**
+ of SQL injection attack.
 
 Data that is contained in the clients request should be mapped to an object that exists within the backend of the API. This allows for a safe and secure conversion of data for the server to deal with, in addition to sending back a bad request status code if a field does not match.
 Avoid using hardcoded request.getParameters to place data into queries for insertion into a database, first data should be mapped to an identical model of the object so that another layer of validation is ensured. 
 
-Example
+**EXAMPLE**
+
 
 
 
@@ -222,29 +204,35 @@ These are issues that, if properly addressed at the start, are easily identifiab
 
 ## Broken Access Control
 Broken Access Control had the most occurrences in the dataset collected by OWASP with over 318 thousand counts. This failure can lead to unauthorised access to information, ability to modify and destruct data or to perform business functions that are outside of a user’s privilege. 
+
 Access Control checks can be broken and bypassed by modifying the URL, internal application state or by using an attack tool that can modify a requests body. This can then allow bad actors to gain access to parts of the system that is typically unreachable by the user, such as editing or viewing someone else’s account, by elevating their own privilege to that as an admin when logged in as a user, or acting as a user whilst not being logged in. 
+
 Metadata can be manipulated, such as that JSON Web Tokens (JWT) can be tampered with by abusing their invalidation or a hidden field within the token modified.
+
 To prevent such attacks from occurring, developers should adopt the Least Privilege pattern, where a user’s default access level to any resource is set as “denied” until given permission explicit and that except for public resources, denying requests should be default. Privilege should not be granted based on purely a single condition, i.e. a Boolean flag attached to the request, and should instead be set by a combination of conditions based on resource type.
-Example
+**EXAMPLE**
+
 Web server directory listings must be disabled to ensure files such as the metadata and backup files are not present within web roots.
 
 REST endpoints should locally authenticate each request to minimise latency and reduce the coupling between services. Each Rest CALL is stateless and should check whether the caller is authorised to perform said action.
 
-Example
-
+**EXAMPLE**
 
 Endpoints that are exposed to handle object identifiers, such as any endpoint that receives and ID of an object and performs any actions on said object, should implement access and object-level authorisation checks. These should validate whether the user who is logged in has permissions to perform the action on the object. When this isn’t done, it typically leads to unauthorised information discloser and the potential modification and destruction of all data.
 
 
-Example of using endpoint using object identifier
+**EXAMPLE**
+ of using endpoint using object identifier
 
 
 It is recommended that, rather than rely on an ID of an object, to use a separate field of GUID, or the Globally Unique Identifier. This is a 128-bit string that represents an extra ID for an object and can be used to identify information or objects.
 
 
-Example of an endpoint that does not use any authorisation.
+**EXAMPLE**
+ of an endpoint that does not use any authorisation.
 
-Example of a parameter that is modified reaching the system.
+**EXAMPLE**
+ of a parameter that is modified reaching the system.
 
 
 Access Control can be furthered by having an allowlist of permitted HTTP methods, especially for user groups and levels of authentication. Requests that don’t match the allowlist should be responded with a HTTP response code 405 Example.
@@ -266,7 +254,8 @@ JWTs must contain the following standard claims to be verified, however this is 
 
 https://www.chosenplaintext.ca/2015/03/31/jwt-algorithm-confusion.html https://www.youtube.com/watch?v=bW5pS4e_MX8
 
-Example of JWT being attached and verified.
+**EXAMPLE**
+ of JWT being attached and verified.
 
 ### Whats an API Key?
 Primarily used as an authentication to access an APIs service, API keys are used to ensure that the user making the request is verified within the system and that the API key is valid and verified within the system. 
@@ -283,9 +272,11 @@ Timestamps could be added to the header of the request so that the server can co
 Broken Access Control can be abused by allowing users without authentication or authorisation to pose as users or admins without permission by extraneous methods. Splitting up the admin and user access with different URLS means that an attacker cannot just force browse to target URLS. Management and admin endpoints should not, under any circumstance, be exposed to the internet or in root calls of discoverability (i.e., HATEOS).
 
 
-Example of admin URL that can be accessed with and without verification
+**EXAMPLE**
+ of admin URL that can be accessed with and without verification
 
-Example of Admin Layer, and Client Layer.
+**EXAMPLE**
+ of Admin Layer, and Client Layer.
 
 
 
@@ -295,7 +286,8 @@ Requests can be forged by malicious actors who have gained access to an authenti
 
 The higher level of privilege the victim has, the more damage that can be done and the system will be unable to distinguish between legitimate, authorised requests and forged ones. Cross-Site Scripting (XSS) can defeat all mitigation techniques for CSRF as it will execute within the same origin as the site being exploited. 
 
-Example of Request Forgery.
+**EXAMPLE**
+ of Request Forgery.
 
 Luckily, CSRF attacks can only work when proper authentication is not used and can only exploit functionality exposed by the API and the users privilege. 
 
@@ -324,13 +316,16 @@ There are certain HTTP methods that, if performed numerous times on the same res
 For example, sending multiple GET requests to the same URI should result in the same object being retrieved, or a DELETE request to return either 204 for the first request, and 404 for subsequent requests.
 
 
-Example
+**EXAMPLE**
+
 
 POST and PATCH would be considered not idempotent, for both these requests could cause partial side effects within the system beyond creating or updating a resource. 
 
-Example of Post and how to avoid (Unique ID, checking a UUID)
+**EXAMPLE**
+ of Post and how to avoid (Unique ID, checking a UUID)
 
-Example of Patch
+**EXAMPLE**
+ of Patch
 
 
 
@@ -342,7 +337,9 @@ Content Types are the agreed upon format between a client and server on how data
 
 RESTful APIs should include a list of accepted media types, that can be requested by the client for them to understand what media types are supported by the resources.
 Requests that are received with a content type that is not supported by the API, or is invalid, it should be rejected from the system with 406 (“Not Acceptable”) or 415 (“Refusal to accept request”).
-Example of Content Types
+
+**EXAMPLE**
+ of Content Types
 
 For more information on the full current best standard for Media Type Specifications, visit [RFC 6838](https://www.rfc-editor.org/rfc/rfc6838).
 
@@ -366,9 +363,15 @@ Why do we need to standardize them?
 An API is more than just the resources it houses and operations it can execute. Each API request requires network bandwidth, CPU, memory, and storage.  Some APIs may make use of external, third-party APIs that handle specific functionality, such as sending emails, texts or returning a value or subset of data that an operation requires before returning a response. If these services and operations could be abused or lack strategies to mitigate the effect of these factors being abused, it could critically cost the developer in both time and monetary value.  It could also cause a denial of service for other clients due to resource starvation.
 
 For example, an API that does not limit client interactions or resource consumption can face bad clients crafting their requests in such a way that can overload the system, impacting the performance and the responsiveness. A specially crafted API request could also expose system functionality, leading to authentication breaking and data leakage.
-Example request. Amount of results to return. How many times the request is sent. Costs came from it being ran too much. Using a third party 
+
+**EXAMPLE**
+ request. Amount of results to return. How many times the request is sent. Costs came from it being ran too much. Using a third party 
+
 An example request that could abuse the systems resources may look like this:
-Example request of abusing it.
+**EXAMPLE**
+ request of abusing it.
+
+
 Monitoring Request Duplication (again). Weve talked about authorising locally on each endpoint. 3rd party API usage (i.e sending emails, texts, doing an external service to return data to the API etc)
 Example of what unrestricted access looks like and restricted request. What the drawbacks 
 Luckily, there are multiple methods and avenues a developer should follow when implementing strategies to limit resource consumption.  
@@ -419,7 +422,8 @@ Googles <hyperlink> API Design practices defines Custom Methods to have the foll
 
 7.	If the HTTP verb used for the custom method does not accept an HTTP request body, i.e. a GET or DELETE, the HTTP configuration must not use a request body at all, and all other request messages shall map to the URL query parameters.
 
-Example of use cases and examples of the above being used.
+**EXAMPLE**
+ of use cases and examples of the above being used.
 
 
 Before using a custom method to achieve functionality, developers should ensure that using a custom method is needed instead of standard methods. For example, if the client wants to query a resource with different parameters, a standard GET would do fine, or to change a resources property a PUT would suffice. Only when it is necessary should a custom method be use.
@@ -473,9 +477,11 @@ It is recommended for developers to have a dedicated service or class in the ser
 
 
 
-Example of a type of message that should be returned and what should not be returned when a bad request/something fails occurs. 
+**EXAMPLE**
+ of a type of message that should be returned and what should not be returned when a bad request/something fails occurs. 
 
-Example of code.
+**EXAMPLE**
+ of code.
 
 Correct HTTP status codes must be used for all responses by the API to indicate the outcome of a given request. A Status Code is a number that corresponds to a specific meaning based on the result of a request to the API. It is not required to understand and know all the accepted status codes, however there are classes of status codes that are identifiable by the initial digit of the status code.
 
@@ -496,12 +502,15 @@ Extension status codes can be supported, and more can be found in [this link](ht
 
 The web API must return messages that contain the correct HTTP status code so that the client can determine how next to handle the result if needed. 
 
-Example of error code when a function is FORBIDDEN access. 
+**EXAMPLE**
+ of error code when a function is FORBIDDEN access. 
 
-Example of bad request. 
+**EXAMPLE**
+ of bad request. 
 
 
-Example of a resource that has moved and indicating where it has gone.
+**EXAMPLE**
+ of a resource that has moved and indicating where it has gone.
 
 
 # Handling Large Requests and Responses
@@ -525,7 +534,8 @@ https://bpglibrary-official.com/books/v1
 </example>
 This, in return, would return a response body with the full resource, alongside any others that may be attached due to the nature of the API.
 <example>
-EXAMPLE OF RESPONSE BODY
+**EXAMPLE**
+ OF RESPONSE BODY
 </example>
 
 Requesting for a partial response would still target the same resource, however it would use field parameters so the API can reduce the data returned.
@@ -535,9 +545,10 @@ https://bpglibrary-official.com/books/v1?fields=
 </example>
 
 The partial response would look as such:
-<example>
-EXAMPLE OF PARTIAL RESPONSE
-</example>
+
+**EXAMPLE**
+ OF PARTIAL RESPONSE
+
 Fields that do not match either the data type, or formatting scenario-specific, should have their requests rejected for security. 
 Patch Partial update
 
@@ -553,7 +564,8 @@ A request which does not contain this information should be responded with a 401
 If the client is attempting to access a restricted resource or operation, the request must contain the required information to authenticate their access level. This could be done with a JWT or an API key.
 
 
-Example of a Stateless request including authentication, the body of data and anything else needed.
+**EXAMPLE**
+ of a Stateless request including authentication, the body of data and anything else needed.
 
 # Data Retention
 Data retention is a critical aspect of any services reliability, and not having safety measures in place that ensure clients cannot mistakenly or incorrectly delete data should be avoided at all cost. Without having data retention in the REST API, it increases the chances that clients who make mistakes cannot go back on them.
@@ -604,7 +616,8 @@ For some applications, it may not be required to version the API. This could be 
 
 For example, a request to an API with no versioning would like this:
 
-Example of Request with no versioning in uri, so just a normal request
+**EXAMPLE**
+ of Request with no versioning in uri, so just a normal request
 
 Changes would be represented as a new resource or operation that can be executed without reliance on existing functionality.
 
@@ -616,23 +629,28 @@ Due to this, this method may not be the best fit. The following approaches may b
 ## Versioning through the URI 
 The URI for each resource exposed will include a version indicator of the API. For example, if we wanted to make a request to the 2.0 version of the book API, a request would look like this:
 
-Example of the URI having the versioning. Response.
+**EXAMPLE**
+ of the URI having the versioning. Response.
 
 URIs from previous versions must still be usable by the client, which does mean that we must violate the principle of having each URI refer to a unique resource.
 
-Example of the URI from a prior version.
+**EXAMPLE**
+ of the URI from a prior version.
 
 The previous URIs should return the resource that is the same as their original schema
 
-Example of the response body that matches the old schema.
+**EXAMPLE**
+ of the response body that matches the old schema.
 
 As you can probably see, this can get quite cumbersome and complicated as the API grows and evolves. HATEOAS would be complex to implement as each link would also have to include the version number.
 
 ## Versioning through a Custom Request Header
 An easier, more consistent method of versioning the API is to include the API version indicator in the request headers. This method avoids the complexity of including the version for resources across the versions.
-Example of the request with the Version 1
+**EXAMPLE**
+ of the request with the Version 1
 
-Example of the request with the Version 2
+**EXAMPLE**
+ of the request with the Version 2
 
 This method does require the client applications to add the header to all requests.
 If the API version is not included, a status code of 400 and an apt message describing the issue must be returned to the client. 
@@ -641,21 +659,22 @@ It has been stated before that as API functionality evolves and grows, changes m
 Old functionality may be deprecated if a major overhaul or change has been made to the inner workings of the system, and we may not want clients to use the old functionality anymore as it is less secure or not as efficient. It is up to the developer to alert the client that the service is going to be deprecated, and to provide a date or indication of when they should expect this functionality to stop working.
 Let us say we deprecate the service which allows clients to rent a book through the book keeping API. The client may be unaware of this, and will send a request to API with the relevant URI:
 
-Example of request
+**EXAMPLE**
+ of request
+
 If the functionality is still available, but is going to be deprecated in a weeks’ time, the response may look like:
-Example of response and its status code.
+
+**EXAMPLE**
+ of response and its status code.
 
 
 <description of Service> will retire on <date> (url) where the URL could show more info.
 
 If the functionality has fully deprecated and is no longer used by the API, the API must return a response that contains a 410-status code and a response body of:
-Example of response from a deprecated service.
+
+**EXAMPLE**
+ of response from a deprecated service.
 Additionally, developers should be removing unused dependencies and libraries that are deprecated or no longer supported. Reviews of used libraries and dependencies should be conducted regularly.
-
-
-
-
-
 
 
 
