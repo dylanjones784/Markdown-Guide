@@ -20,3 +20,12 @@ My guideline differs from other best practice guides, primarily from the fact th
 
 
 - It is important to note that expecting developers to strictly adhere to every practice and standard is not practice nor feasible. Therefore, the aim of this guide is to provide a foundational framework for the common issues and challenges faced when creating REST and, by extension, all Web APIs.
+
+
+# To do 
+
+Examples / Code Snippets - Doing
+
+C# API Example - Next
+
+Implement Feedback - Awaiting
