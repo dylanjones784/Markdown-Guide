@@ -1,1 +1,0 @@
-Could put the design stuff in here. Splits it up. Not too important for now just an idea.
