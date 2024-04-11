@@ -7,30 +7,99 @@ Employing proper design theories and patterns can, and often have, prevent futur
 REST will be briefly discussed and how we can ensure our APIs adhere to those principles set by Roy Fielding, as well as the how we will utilise the HTTP Specification.
 
 
+```json
+	200 OK
+	Content-Type: application/json; charset…
+	Content-Length:…
+{
+    "bookID": 24,
+    "title": "Big Book of Knowledge",
+    "author": "Peter Jackson",
+    "pubDate": "2012-04-16",
+    "availability": "Available",
+    "links": [
+        {
+            "href": "",
+            "link": "",
+            "rel": ""
+        }
+    ]
+}
+
+```
+
 
 ## What’s REST?
 Representational State Transfer is a network architectural approach to the communication of hypermedia through computer systems across the web. It is the most common type of API used on the internet to date, for it is independent of any underlying protocols and not restricted to usage just through HTTP calls. 
 
 This guide focuses on the usage of HTTP as the applications protocols when designing REST APIs. This guide will not encompass the entirety of what REST is, however, the main design principles are as follows:
 
- A RESTful API contains resources, which can be representations of data, objects or a service that is accessible by the user.
+A RESTful API contains resources, which can be representations of data, objects or a service that is accessible by the user.
 
 - Every resource has a unique identifier, which is used to identify the resource. This is called the Uniform Resource Identifier.
 
-**EXAMPLE**
+
+```text
+https://bpg-library.com/books/4
+```
+
 
 - These resources are manipulated by having their representations sent to the client through well-defined operations. For HTTP, this would be through the standard methods of GET, PUT, POST, PATCH & DELETE.
 
-- The server will communicate with clients through various content types that are agreed upon by the client and the server. For example, if the above example was used in a GET request, a JSON response body may look like below.
+- The server will communicate with clients through various content types that are agreed upon by the client and the server. For example, if the above example was used in a GET request, a JSON response body may look like below:
 
-**EXAMPLE**
+
+```json
+{
+    "bookID": 3,
+    "title": "Almighty Prison",
+    "author": "Rath Scollington",
+    "pubDate": "1993-04-16",
+    "availability": "Unavailable",
+    "_links": [
+        {
+            ...
+        }
+    ]
+}
+
+```
 
 - RESTful API Client-Server communications are classed as stateless. Each request is treated as independent to any other, and it must contain the entirety of the information required for the request to be processed. There are no client sessions, and the server will never rely on previous requests from clients. Having each request being atomic in nature allows for any server can handle any request as there are no session-related dependencies, as well as making the API less complex.
+
 - Responses should be labeled for caching or not appropriately. If the response is cacheable, the client should then be able to reuse that response data later for a specific length of time.
+
 - RESTful APIs should each component organized into layers, for example the client would interact with the Presentation Layer (The UI), and that would interact with the Application Layer.
+
 - Clients should be able to navigate throughout the API without prior knowledge of the applications endpoints, and that with a single URI the application should dynamically attach relevant resources via hyperlinks. This is called Hypermedia as the Engine of Application State(HATEOAS).
 
-**EXAMPLE**
+
+```json
+{
+    ...
+  "_links": {
+    "self": { "href": "bpg-library.com/" },
+    "books": { 
+        "href": "bpg-library.com/books",
+        "action": "GET",
+        "rel": "books",
+        "types":["text/xml","application/json"]
+    },
+    "authors": { 
+        "href": "bpg-library.com/members",
+        "action": "GET",
+        "rel": "members",
+        "types":["text/xml","application/json"]
+    },
+    "search": { 
+        "href": "bpg-library.com/books/",
+        "title": "Search for books",
+        "method": "POST",
+    }
+  }
+}
+
+```
 
 We can measure an API's adherence to the REST Principles by using the [Richardson Maturity Model for Web APIs](https://martinfowler.com/articles/richardsonMaturityModel.html). Created in 2008 and designed to break down the main elements of the REST approach into three simple steps.
 
@@ -39,7 +108,7 @@ We can measure an API's adherence to the REST Principles by using the [Richardso
 - Level 2 – HTTP methods and verbs are used.
 - Level 3 – Discoverability of functionality within the API through hypermedia controls.
 
-Level 3 would correlate to having a truly RESTful API that encompasses all of Fielding’s original definition, however typical Web APIs fall into the Level 2 category. To find out further on Level 3 and the usage of Hypermedia, please visit [link to HATEOAS section](#).
+Level 3 would correlate to having a truly RESTful API that encompasses all of Fielding’s original definition, however typical Web APIs fall into the Level 2 category. To find out further on Level 3 and the usage of Hypermedia, please visit [this section](#resource-discovery).
 
 
 
@@ -61,25 +130,41 @@ HTTP Status codes are indicators on the state of a HTTP request that has been se
 | 5xxx  | Server Error        | Server failed to fulfill the valid request.                       |
 
 
-It is recommended for developers to have a dedicated service or class in the server layer that is dedicated to returning generic return messages alongside the correct status code as outlined in 
+It is recommended for developers to have a dedicated service or class in the server layer that is dedicated to returning generic return messages alongside the correct status code. 
 
-Correct HTTP status codes must be used for all responses by the API to indicate the outcome of a given request. 
-
-To find more on Status Codes, visit [The RFC](https://datatracker.ietf.org/doc/html/rfc7231#section-6).
-
-Extension status codes can be supported, and more can be found in [this link](https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml).
+Correct HTTP status codes must be used for all responses by the API to indicate the outcome of a given request. Below is a table of what developers should return for each of the HTTP operations
 
 
-**EXAMPLE**
- of error code when a function is FORBIDDEN access. 
 
-**EXAMPLE**
- of bad request. 
+| Method | Description                                | Response Status Code                    |
+|--------|--------------------------------------------|-----------------------------------------|
+| PATCH  | Create/Modify the resource with JSON       | 200-OK, 201-Created                |
+| PUT    | Create/Replace the whole resource          | 200-OK, 201-Created                     |
+| POST   | Create new resource                           | 201-Created with URL of created resource |
+| POST   | Action                                     | 200-OK                                   |
+| GET    | Read resource or collection                | 200-OK                                   |
+| DELETE | Delete resource                       | 204-No Content; avoid 404-Not Found     |
 
 
-**EXAMPLE**
- of a resource that has moved and indicating where it has gone.
 
+
+If a user is forbidden from access, i.e not authorised, a 403-Forbidden should be returend.
+
+
+Some client requests may have mismatching data types to what is expected in the API, or perhaps set a Content-Length 
+
+
+Delete requests?
+
+
+
+
+For requested resources who have had their URL changed, the status code 301 - Moved Permanently / 302 - Found (Moved Temporarily) should be returned.
+
+
+
+
+To find more on Status Codes, visit [RFC 7231](https://datatracker.ietf.org/doc/html/rfc7231#section-6).
 
 
 
@@ -87,10 +172,11 @@ Extension status codes can be supported, and more can be found in [this link](ht
 Content Types are the agreed upon format between a client and server on how data should be returned. For example, a GET request may return data in a JSON or XML format. The request will contain a header that specifies the formats that are acceptable, this is referred to as “media types”.
 
 RESTful APIs should include a list of accepted media types, that can be requested by the client for them to understand what media types are supported by the resources.
+
 Requests that are received with a content type that is not supported by the API, or is invalid, it should be rejected from the system with 406 (“Not Acceptable”) or 415 (“Refusal to accept request”).
 
-**EXAMPLE**
- of Content Types
+Some of the more popular formats of content types that should be supported are “text/plain“, “application/xml“, “text/html“, “application/json“, “image/gif“, and “image/jpeg“.
+
 
 For more information on the full current best standard for Media Type Specifications, visit [RFC 6838](https://www.rfc-editor.org/rfc/rfc6838).
 
@@ -106,7 +192,8 @@ Data types supported within a RESTful web API should conform to those that are u
 | Text      | String       |
 
 
-Why do we need to standardize them?
+### Why do we need to standardize data types?
+TBD
 
 
 
@@ -115,7 +202,9 @@ Resource Oriented APIs are modelled as a “resource hierarchy” where each end
 
 Imagine you have been given the ownership of land, large enough for you to build your dream castle. You know that you want a keep to live in, surrounded by a large wall that can be manned by your loyal men and a moat to keep out the riffraff. Before instructing workers to begin building, it would be wise to check the surrounding areas for resources that could be used throughout the build and base their designs on what is available to use. It would be inefficient to use resources that were not relevant to the design requirements set.
 
-The same principles can be applied for designing a solid RESTful API, for a developer should initialize their design process by identifying the business entities and endpoints that will be exposed to the client prior to development. Having your design dependent on the resources you expect to expose allows for a simplistic interface that can adapt rapidly to evolving functionality. For example, in a bookkeeping system, the main entities that may be exposed could be Authors and Books. To create a new Book, a HTTP POST request that contains the book information would be sent to our API. The following HTTP response would then indicate if the book was created, or if the process had failed.
+The same principles can be applied for designing a solid RESTful API, for a developer should initialize their design process by identifying the business entities and endpoints that will be exposed to the client prior to development. Having your design dependent on the resources you expect to expose allows for a simplistic interface that can adapt rapidly to evolving functionality. 
+
+For example, in a bookkeeping system, the main entities that may be exposed could be Authors and Books. To create a new Book, a HTTP POST request that contains the book information would be sent to our API. The following HTTP response would then indicate if the book was created, or if the process had failed.
 
 | Example                                                   | Description |
 | --------------------------------------------------------- | ----------- |
@@ -124,10 +213,10 @@ The same principles can be applied for designing a solid RESTful API, for a deve
 
 It is important to note that a resource doesn’t have to be a single piece of data, for example the book resource might be comprised of multiple tables from a database, but the client would only see the returned object as a single entity. Developers should not, when designing their API, mimic their database relationships for it is the purpose of REST to model the entities and operations that the application can perform on those entities. The inner workings of the system should not be exposed to clients.
 
-To see more on securing your API, visit [hyperlink to Securing your endpoint](#).
 
 ## Resource Hierarchy
-Resource-oriented APIs are modelled as a resource hierarchy, where each node (resource endpoint) is either a simple resource or a collection resource. We define resources as the nouns of REST, and that we define these resources within the API so that we can expose them to be manipulated with a small number of methods <hyperlink to HTTP methods> that are referred to as the verbs of REST.  
+Resource-oriented APIs are modelled as a resource hierarchy, where each node (resource endpoint) is either a simple resource or a collection resource. We define resources as the nouns of REST, and that we define these resources within the API so that we can expose them to be manipulated with a small number of methods that are referred to as the verbs of REST. 
+
 
 Developers should adopt a consistent naming convention for URIs that follows the noun / verb pattern.
 
@@ -135,20 +224,58 @@ Developers should adopt a consistent naming convention for URIs that follows the
 - A simple resource would be a singular resource, i.e., “member”.
 - An HTTP GET request would be the verb.
 
-The following URI represents the collection of books available. 
-**EXAMPLE**
-https://bpglibrary-official.com/books 
 
 HTTP GET requests to this collection URI would retrieve a list of book objects that are available in the database. Each book in that collection would have its own unique URI, that the client can use HTTP GET request on to return the details of that book.  
+```text
+https://bpg-library.com/books 
+```
 
-To envision what the resource hierarchy will look like and how it works, physically writing down the endpoints for the API as a chart
+The returning body would like the example below.
 
-It may help the deisng process to envision what the resource hierarchy will look like physically, through the use of a diagrams. An example of which can be found below on the example “bpglibrary” API.
+```json
+[
+  {
+    "bookID": 24,
+    "title": "Big Book of Knowledge",
+    "author": "Peter Jackson",
+    "pubDate": "2012-04-16",
+    "availability": "Available",
+    "links": {
+      "self": "bpg-library.com/books/24"
+    }
+  },
+  {
+    "bookID": 57,
+    "title": "The Art of Programming",
+    "author": "Donald Knuth",
+    "pubDate": "1997-07-01",
+    "availability": "Available",
+    "links": {
+      "self": "bpg-library.com/books/57"
+    }
+  },
+  {
+    "bookID": 102,
+    "title": "To Kill a Mockingbird",
+    "author": "Harper Lee",
+    "pubDate": "1960-07-11",
+    "availability": "Unavailable",
+    "links": {
+      "self": "bpg-library.com/books/102"
+    }
+  }
+  ...
+]
+
+```
+
+It may help the deisng process to envision what the resource hierarchy will look like as a chart, through the use of a diagrams. An example of which can be found below on the example “bpglibrary” API.
 
 ![image info](./pics/rh.png)
 
  
-The main API service is “bpglibrary.com” that features two collection URIs, books and members. /books is the path to the book collection, and /books/10 would retrieve the book with an ID of 10. A RESTful API should also support parametrized URI paths, such as the books/*/{id} path and should behave similar to a network file path. Having the resources set in a hierarchical nature leads to a logical and easily understandable naming convention. 
+In the scenario used for this guide, the main API service 
+The main API service is “bpglibrary.com” that features two collection URIs, books and members. /books is the path to the book collection, and /books/10 would retrieve the book with an ID of 10. A RESTful API should also support parametrized URI paths, such as the books//{id} path and should behave similar to a network file path. Having the resources set in a hierarchical nature leads to a logical and easily understandable naming convention. 
 
 Certain terms and words should be avoided when naming URIs, specifically:
 -   elements
@@ -160,7 +287,7 @@ Certain terms and words should be avoided when naming URIs, specifically:
 -   types
 -   values
 
-A pitfall the example above can face is the over-expression of relationships between the different resources that are exposed. For example, each book has an author, and a client could navigate to a specific author via the path /books/*/{id}/author/, but it could also go in the other direction and the association between the author and each of their books could be retrieved via the path /authors/*/{name}. Building your API around these associations will quickly lead to confusion and become far larger than the scope originally required, to which the REST solution would be to use HATEOAS to enhance the discoverability of the resources in the API and how they can be manipulated.
+A pitfall the example above can face is the over-expression of relationships between the different resources that are exposed. For example, each book has an author, and a client could navigate to a specific author via the path /books/{id}/author/, but it could also go in the other direction and the association between the author and each of their books could be retrieved via the path /authors/{name}. Building your API around these associations will quickly lead to confusion and become far larger than the scope originally required, to which the REST solution would be to use HATEOAS to enhance the discoverability of the resources in the API and how they can be manipulated.
 
 
 ## Resource Discovery 
@@ -175,18 +302,7 @@ Using REST, we can include hypermedia links in an API response to show clients r
 
 For example, if a client makes a request to retrieve a collection of books available in the system, the response will contain extra links that contains the information necessary to discover directly related resources and services.
 
-
 **EXAMPLE**
-
-GET https://bpglibrary-official.com/books/24 
-ACCEPT: text/JSON
-
-**URL Pattern**
-```text
-https://.../<resource-collection>/<resource-id>:<action>?<input parameters>
-```
-
-
 ```json
 	200 OK
 	Content-Type: application/json; charset…
@@ -210,9 +326,7 @@ https://.../<resource-collection>/<resource-id>:<action>?<input parameters>
 
 Hypermedia links are required to be in an array of “links” in the response body. 
 
-The format this guide is using for hypermedia references is the RFC 5988 Web Linking <hyperlink>.
-
-We use this RFC standard as a framework for building links that define the relationships of a given resource. It states that hypermedia links must contain the following properties:
+We use the [RFC8288](https://www.rfc-editor.org/rfc/rfc8288) standard as a framework for building links that define the relationships of a given resource. It states that hypermedia links must contain the following properties:
 
 1. Target URI – Represented by the href attribute.
 2. Link Relation – The relation between the source and the target resource.
@@ -225,6 +339,8 @@ The hypermedia links may change as the resource state is altered, i.e there is d
 As we provide the hypermedia for related content in a request, it is recommended that we do a list of things to secure and limit access to higher level data access. HATEOAS should not be used for Admin services, nor should hypermedia links expose more of the system than necessary.
 
 It should be noted that many scenarios may not allow for this level of discoverability, perhaps due to company policy or data security. If that is the case, HATEOAS is not necessarily needed and a RESTful API that reaches Level 2 in the Richardson Maturity Model is still a solid service
+
+
 
 # Implementing the API
 
@@ -252,11 +368,11 @@ There are some drawbacks to this, mainly being the increased application complex
 It is important to note that some layers may perform multi-uses, such as one layer handling both the business logic and data access of the API, or that requests are validated within the presentation layer prior to be sent to the server. Developers should keep these layers as simplistic as possible, allowing the API to remain simplistic in design and easily adaptable to future functionality being added.
 
 
-The following sections will cover the best practices and design patterns one should follow when configuring and creating the access control for the API. It is a coagulation of security practices from Microsoft, Google, REST API professionals and The Open Worldwide Application Security Project Top 10 Web Application Security Risks & the API Security Top 10. To delve deeper into the OWASP Top 10, which features an extensive list of potential security risks and ways to mitigate the effects, visit [OWASP API Security Project | OWASP Foundation](https://owasp.org/www-project-top-ten/)
+The following sections will cover the best practices and design patterns one should follow when configuring and creating the access control for the API. It is a coagulation of security practices from Microsoft, Google, REST API professionals and The Open Worldwide Application Security Project Top 10 Web Application Security Risks & the API Security Top 10. To delve deeper into the OWASP Top 10, which features an extensive list of potential security risks and ways to mitigate the effects, visit the [OWASP API Security Project](https://owasp.org/www-project-top-ten/) website.
 
 
 ## Securing and Verifying Communication Channels
-Communication channels are how the API receives and sends data to the client and with HTTPS, data in transit is secure with the Transport Layer Security (TLS) protocol<hyperlink>.
+Communication channels are how the API receives and sends data to the client and with HTTPS, data in transit is secure with the Transport Layer Security (TLS) protocol.
 
 The TLS protocol was created to facilitate privacy and data security for communications between systems on the internet. It is advised that developers do not use anything other than HTTPS if creating a HTTP RESTful API, and to adopt further methods of securing client data.
 
@@ -270,12 +386,32 @@ On the Presentation Layers that allow for users to enter their own data for subm
 **EXAMPLE**
  of SQL injection attack.
 
+ ```text
+POST https://bpg-library.com/books/4
+
+```
+
+
 Data that is contained in the clients request should be mapped to an object that exists within the backend of the API. This allows for a safe and secure conversion of data for the server to deal with, in addition to sending back a bad request status code if a field does not match.
+
 Avoid using hardcoded request.getParameters to place data into queries for insertion into a database, first data should be mapped to an identical model of the object so that another layer of validation is ensured. 
 
-**EXAMPLE**
+For example, the Book class is set out as a Model in this examples C# code.
 
+**EXAMPLE** - -????
 
+```code
+public class Book
+{
+    public int BookID { get; set; }
+    public string Title { get; set; }
+    public string Author { get; set; }
+    public DateTime PubDate { get; set; }
+    public string Availability { get; set; }
+}
+
+```
+In my corresponding 
 
 # Configuring Access Control
 Broken or misconfigured access control on APIs were in the top 6 of both the OWASP Web API & the API Security Risks in 2021 and 2023 respectively. The root causes of these issues stemmed from:
@@ -377,8 +513,6 @@ Requests can be forged by malicious actors who have gained access to an authenti
 
 The higher level of privilege the victim has, the more damage that can be done and the system will be unable to distinguish between legitimate, authorised requests and forged ones. Cross-Site Scripting (XSS) can defeat all mitigation techniques for CSRF as it will execute within the same origin as the site being exploited. 
 
-**EXAMPLE**
- of Request Forgery.
 
 Luckily, CSRF attacks can only work when proper authentication is not used and can only exploit functionality exposed by the API and the users privilege. 
 
@@ -482,18 +616,29 @@ Chatty APIs are APIs which expose a large number of small resources, requiring t
 
 We can identify a "chatty" API by the following example:
 
-The bookkeeping system has an endpoint to retrieve a books Author, Title, ISBN, and Publish Date. The client would make a request to be accepted like below to return the chosen books data.
+The bookkeeping system has an endpoint to retrieve a books Author, Title, ISBN, and Publish Date. The client have to make a request to be accepted like below to return the chosen books data.
 
 **Example** of code to accept bookId/fields
 
-For the client to retrieve all the data on the book, they must make multiple requests to get all the required data. Instead of this, the endpoint could look like this to return all the data.
+```text
 
-**Example** of request to getBook by ID
+    [HttpGet("{bookId}/title")]
+    public IActionResult GetBookTitle(int bookId)
+    {
+        ...
+    }
 
+    [HttpGet("{bookId}/pubdate")]
+    public IActionResult GetBookPubDate(int bookId)
+    {
+        ...
+    }
 
-This should be avoided, for this over-exposure is 
+```
 
-If these services and operations could be abused or lack strategies to mitigate the effect of these factors being abused, it could critically cost the API in both down time and monetary value.  It could also cause a denial of service for other clients due to resource starvation.
+This type of issue can be abused, and if there is a lack of strategies to mitigate the effect of this issue being abused, it could critically cost the API in both down time and monetary value.  
+
+It could also cause a denial of service for other clients due to resource starvation.
 
 
 ### Limiting the Rate of Requesting (Rate Limiting)
@@ -528,7 +673,9 @@ To combat such avenues of exploitation on your services, there are methods and p
 Resource-oriented design RESTful APIs can express further actions one can do on a resource beyond standard HTTP methods. Custom methods typically align with the intent of the method itself and should only be used for functionality that cannot be easily expressed via standard HTTP methods.
 
 Types of functionalities could consist of performing a task, to undelete a resource, to cancel the last or outstanding operation (i.e., a request that is currently being processed) or to batch get a collection of multiple resources.
-Googles <hyperlink> API Design practices defines Custom Methods to have the following guidelines to be applied when choosing the HTTP mapping of a Custom Method:
+
+
+The [Google API Design Guide](https://cloud.google.com/apis?hl=en) defines Custom Methods to have the following guidelines to be applied when choosing the HTTP mapping of a Custom Method:
 
 1.	Custom methods should use HTTP post for it has the most flexible semantics, accommodating for a wider range of input data and actions that can be done. 
 
@@ -547,6 +694,15 @@ Googles <hyperlink> API Design practices defines Custom Methods to have the foll
 **EXAMPLE**
  of use cases and examples of the above being used.
 
+ 
+```text
+
+POST https://bpg-library.com
+```
+
+
+
+
 
 Before using a custom method to achieve functionality, developers should ensure that using a custom method is needed instead of standard methods. For example, if the client wants to query a resource with different parameters, a standard GET would do fine, or to change a resources property a PUT would suffice. Only when it is necessary should a custom method be use.
 
@@ -558,16 +714,23 @@ The last thing a developer wants is to find out way after the fact that their se
 An API which does not correctly handle exceptions or log their errors may contain these risks: 
 -	Failure to audit high-value events, such as logins, failed attempts and large transactions.
 -	Warnings and errors generate unclear log messages, increasing the difficulty of identifying the root issue
+
 - Logs stored locally, following no format.
+
 - Client confusion when a badly formatted request is sent and no meaningful message nor status code is returned.
 
-Developers should follow these patterns when implementing exception and error handling:
+
+Developers should follow these patterns when developing their API's exception and error handling:
 
 -All logins, access control and server-side input validations to be logged with sufficient user context (i.e., an identifiable user detail) so that suspicious or malicious accounts can be identified and analysed forensically.
 -	Ensure that all error logs that are generated are in a consistent format.
+
 -	An audit trail of a user’s interactions and commands they have executed within the system should be kept and only allowed access by admin users.
--	In the event of a breach or illicit conduct, sufficient incident response or recover plans should be in place to help mitigate the aftereffects. See the National Standards and Technology (NIST) 800-61r2 or later for more<hyperlink>.
+
+-	In the event of a breach or illicit conduct, sufficient incident response or recover plans should be in place to help mitigate the aftereffects. See the [National Standards and Technology (NIST) 800-61r2](https://csrc.nist.gov/pubs/sp/800/61/r2/final) or later for more.
+
 -	Use a standardised error response format.
+
 -	Usage of HTTP Status Codes.
 
 Developers should not, under any circumstance, alert the user by making the logging and alerting events visible to the user as it will leave leak vulnerable information.
@@ -587,27 +750,58 @@ A solid RESTful API will implement a technique called Pagination. It is a techni
 
 The REST API should support query strings that allows clients to filter and refine requests so that the fetched data can be delivered in a more manageable manner. There are parameters that the user can add to their request that indicates to the API that they want to paginate the results.
 
-Lets take this URI for example
-**Example** of URI to collections
+```text
+GET https://bpg-library.com/orders
+```
+
+Lets take this URI for example.
 
 This URI could conceivably return a large amount of data, and we are essentially forcing the client to deal with this and then comb over the data once its returned. Instead, the URI could be altered to such:
 
-**Example**  URI with -- /books?limit=10&offset=20
+```text
+GET https://bpg-library.com/orders?limit=10&offset=20
+```
 
 This is telling the endpoint to return a dataset maximum of 10, using the order specified by the offset value of 20. This will return the first 10 books after the 20th record stored.
 
 
 Developers must ensure that the paginated responses contain certain metadata to tell the user what page they are on, how many pages are left and how many records are returned per page. 
 
-Page – Integer – Page number of results being returned.
-Page Size – Integer – How many objects are returned per page.
-Total Pages – Integer - The number of pages that are available to the client. 
-Navigation Links – Hyperlinks - Links enabling navigation between previous and subsequent pages.
 
-Total Records – How many objects are available in total, i.e., the total resources within that collection.
+
+| Field             | Type      | Description                                       |
+|-------------------|-----------|---------------------------------------------------|
+| Page              | Integer   | Page number of results being returned.            |
+| Page Size         | Integer   | How many objects are returned per page.           |
+| Total Pages       | Integer   | The number of pages that are available to the client. |
+| Total Records     | Integer   | How many objects are available in total, i.e., the total resources within that collection. |
+| Navigation Links  | Hyperlinks| Links enabling navigation between previous and subsequent pages. |
+
+
 
 A paginated response would look like this:
-**Example** of JSON from a paginated response.
+
+```JSON
+{
+  "page": 1,
+  "page_size": 5,
+  "total_pages": 2,
+  "total_records":10,
+  "orders": [
+    {"id": 1, ...},
+    {"id": 2, ...},
+    {"id": 3, ...},
+    {"id": 4, ...},
+    {"id": 5, ...},
+    "..."
+  ],
+  "navigation_links": {
+    "next": "bpg-library.com/orders?page=2&page_size=5"
+  }
+}
+
+
+```
 
 ### Sorting and Limiting Fields
 What if the client wants specific resources that match certain parameters? Or perhaps return only specific values from a dataset?
@@ -615,14 +809,17 @@ The API should support client filtering by taking a relevant field name as a sor
 
 For example, a client could send a URI like the one below to sort the returned books by their Book ID.
 
-**Example** uri /books?sort=BookId
+```
+GET https://bpg-library.com/books?sort=BookId
+```
 
 Returning only specific values is an extension of how sorting would be implemented, and we can alter it slightly by making it accept a comma-separated list preceded by a command to indicate what values are wanted.
 
 For example, let’s say the bookkeepers want to find all books created by George R.R Martin within our /books collection, but only want the ID and title returned.
 
-**Example** uri /books?fields=BookID, Title
-
+```
+GET https://bpg-library.com/books?fields=BookID,Title
+```
 
 
 ## Data Retention
@@ -640,8 +837,6 @@ To find more information on this topic, especially the legality side, visit [thi
 
 
 
-
-
 ## Caching and Optimisation 
 
 Caching involves storing copies of responses from previous requests, minimising the amount of traffic that flows through the API. Cached data can be stored either locally on the client, or on an intermediary cache server, such as a proxy cache.
@@ -651,12 +846,15 @@ By including caching in the API, it optimises the network usage and improves the
 High performant RESTful APIs must contain caching capabilities. Developers should take the following points into account when implementing caching and improving optimisation.
 
 GETS must be cacheable by default, unless the client specifies otherwise, or a certain condition has been met. 
+
 Sensitive data, such as user profile details, passwords, admin details, should NOT be cacheable. 
 
 
 ### Supporting Client-Side Caching
 Client-side caching is done through the request headers by the client attaching various headers to the request. They are essential to the process, and they provide the necessary information for clients and other components about whether a resource is cacheable. These headers are called Cache-Control.
+
 The most common Cache-Control headers are:
+
 Max-age – The maximum time in seconds for how long the cache will exist.
 
 Private – Indicates that the response is only cacheable on the client’s browser. 
@@ -668,11 +866,35 @@ No-Cache – Indicates that the response can be cached, but it will be revalidat
 No-Store – Response cannot be cached by the client.
 
 Must-Revalidate – Indicates the cached response must be revalidated before being used. 
-Cached responses may become “stale” once they can no longer be used as their current state. It requires a request to the server to either retrieve the data again, or to validate the caches contents.
+
+Cached responses may become “stale” once they can no longer be used as their current state. It requires a request to the server to either retrieve the data again, or to validate the caches contents.Below is an example of a request, and the response that specifies Control-Control headers.
 
 
-Below is an example of a request, and the response that specifies Control-Control headers.
-**Example** of client specifying in req that they want to cache the request. And the response with the headers.
+
+```
+GET https://bpg-library.com/books/44
+```
+
+
+``` JSON
+	200 OK
+    Cache-Control: max-age=1000, private
+    Content-Type: text/json; charset=utf-8
+    Content-Length: ...
+{
+    "bookID": 44,
+    "title": "Big Book of Knowledge",
+    "author": "Peter Jackson",
+    "pubDate": "2012-04-16",
+    "availability": "Available",
+    "links": [
+        {
+            ...
+        }
+    ]
+}
+
+```
 
 
 ### E-Tags
@@ -714,8 +936,11 @@ For some applications, it may not be required to version the API. This could be 
 
 For example, a request to an API with no versioning would like this:
 
-**EXAMPLE**
- of Request with no versioning in uri, so just a normal request
+
+```text
+https://bpglibrary-official.com/...
+```
+
 
 Changes would be represented as a new resource or operation that can be executed without reliance on existing functionality.
 
@@ -727,8 +952,17 @@ Due to this, this method may not be the best fit. The following approaches may b
 ## Versioning through the URI 
 The URI for each resource exposed will include a version indicator of the API. For example, if we wanted to make a request to the 2.0 version of the book API, a request would look like this:
 
+
+
+```text
+https://bpglibrary-official.com/v2/books 
+```
+
+
+
 **EXAMPLE**
  of the URI having the versioning. Response.
+
 
 URIs from previous versions must still be usable by the client, which does mean that we must violate the principle of having each URI refer to a unique resource.
 
@@ -744,21 +978,81 @@ As you can probably see, this can get quite cumbersome and complicated as the AP
 
 ## Versioning through a Custom Request Header
 An easier, more consistent method of versioning the API is to include the API version indicator in the request headers. This method avoids the complexity of including the version for resources across the versions.
-**EXAMPLE**
- of the request with the Version 1
 
-**EXAMPLE**
- of the request with the Version 2
+Lets say we have a versioned API and that our Orders
 
-This method does require the client applications to add the header to all requests.
-If the API version is not included, a status code of 400 and an apt message describing the issue must be returned to the client. 
+```text
+ GET   https://bpglibrary-official.com/v1/orders/3
+ Custom-Header: api-version=2
+ ...
+```
+
+The response for the version 1 will look like below:
+
+``` JSON
+	200 OK
+    Content-Length: ...
+{
+    "id": 3,
+    "bookID": 22,
+    "memberID": 3,
+    "price":9.99,
+    "links": [
+        {
+            ...
+        }
+    ]
+}
+
+```
+
+And now, lets say the client wants to call the API version 2.0, as that contains more fields than the original version.
+
+
+```text
+ GET   https://bpglibrary-official.com/v2/orders/3
+ Custom-Header: api-version=2
+ ...
+```
+
+
+``` JSON
+	200 OK
+    Content-Length: ...
+{
+    "id": 3,
+    "bookID": 22,
+    "memberID": 3,
+    "orderType":2,
+    "price":9.99,
+    "dateOrdered":"2024-04-10" ,
+    "links": [
+        {
+            ...
+        }
+    ]
+}
+
+```
+
+As like previous versionings, the object schema must match the version being set unless it is a conditional value.
+
+All clients are required to do are to include that custom header with their targeted API version.
+
+If the API version is not included, a status code of 400 and an relevant message describing the issue must be returned to the client. 
+
 ## Deprecating Functionality
 It has been stated before that as API functionality evolves and grows, changes may be made to functionality that break existing client applications. Developers should avoid disrupting client interactions, however sometimes this is not possible. 
-Old functionality may be deprecated if a major overhaul or change has been made to the inner workings of the system, and we may not want clients to use the old functionality anymore as it is less secure or not as efficient. It is up to the developer to alert the client that the service is going to be deprecated, and to provide a date or indication of when they should expect this functionality to stop working.
+
+Old functionality may be deprecated if a major overhaul or change has been made to the inner workings of the system, and we may not want clients to use the old functionality anymore as it is less secure or not as efficient. It is up to the developer to alert the client that the service is going to be deprecated, and to provide a date or indication of when they should expect this functionality to stop working. 
+
+
 Let us say we deprecate the service which allows clients to rent a book through the book keeping API. The client may be unaware of this, and will send a request to API with the relevant URI:
 
-**EXAMPLE**
- of request
+```text
+https://bpglibrary-official.com/v1/books/4/rent
+```
+
 
 If the functionality is still available, but is going to be deprecated in a weeks’ time, the response may look like:
 
@@ -766,7 +1060,10 @@ If the functionality is still available, but is going to be deprecated in a week
  of response and its status code.
 
 
+```text
 <description of Service> will retire on <date> (url) where the URL could show more info.
+```
+
 
 If the functionality has fully deprecated and is no longer used by the API, the API must return a response that contains a 410-status code and a response body of:
 
@@ -776,7 +1073,10 @@ Additionally, developers should be removing unused dependencies and libraries th
 
 
 # Open API Specification
-The Open API Initiative was created by industry experts who recognised the need of standardising how APIs are described, and that having a language-agnostic interface allows for both humans and computers to discover and understand the full capabilities of an API without access to the source code.  Although some aspects of this guide have taken influence from the Open API initiative, it requires developers to adhere to a stricter framework and set of standards that it must contain for it to be considered Open API adherent.
+The Open API Initiative was created by industry experts who recognised the need of standardising how APIs are described, and that having a language-agnostic interface allows for both humans and computers to discover and understand the full capabilities of an API without access to the source code.  
+
+Although some aspects of this guide have taken influence from the Open API initiative, it requires developers to adhere to a stricter framework and set of standards that it must contain for it to be considered Open API adherent.
+
 To find out more on the specification, visit [spec.openapis.org/oas/latest.html](https://spec.openapis.org/oas/latest.html)
 
 

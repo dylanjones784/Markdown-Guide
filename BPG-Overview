@@ -2,23 +2,13 @@ Could put the overview in here. Have the sum up, with all the links to those sec
 
 How would i link text to the sections in the guide markdown template?
 
-# Introduction
-This is a best practice guide. I got my research primarily from existing guides and research, as well as security practices recommended by official bodies. Following an amalgamation of all these best practices allows developers to create APIs that not only adhere to the REST architype, but are also …
-Simple, Consistent, Easy To Use, Adaptable , Efficient, Effective, Self-explanatory. This isn’t a do or don’t, this is amalgamation of standards that as a developer, you should follow, to promote those keywords.
-
-
 We will be using keywords that should be interpreted as described in BCP 14, RFC2119, RFC8174. These are "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL”.
 
 
 We will first discuss the design principles and ideologies that should be considered during conception, and the best practices and standards established for creating a REST API. This guide imitates the lifecycle of a Web API, from the conception and design phase and what should be considered, to the actual development and creation of the API following best practices and standards set by various authority bodies and companies.
 
-## Definitions
-All acronyms in here. Will need to get a list when its done 
-URI, HTTP, API ,Rest, URI, URL, HTTPS, JWT, JSON 
-Overview of Sections
 
-
-## Overview Summary
+## Overview
 Here I will sum up the entire guide 
 Key takeaways from each section.
 
