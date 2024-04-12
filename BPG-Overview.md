@@ -24,25 +24,77 @@ We will be using keywords that should be interpreted as described in BCP 14, RFC
 The following sections cover the key takeaways from each of the identified themes of best practices and standards for REST APIs. This list follows;
 
 
+
 - Background information on REST and HTTP, how it should be used.
+
 
 - Resource and Design patterns and standards
 
 
 
 ## Defining Principles: REST and HTTP
+REST and HTTP are the defining factors of our API; we utilise REST
 
--URI patterns. 
-HTtp, request and responses
-Query Paramters and Headers
+## HTTP
 
-Hypermedia
+https://datatracker.ietf.org/doc/html/rfc7231
+Verbs and Nouns
+Idempotency
+HTTP Status codes
+Requests and Responses
 
-## API
+Query paramters and headers
+Content types,
+Data types
+
+## REST
+
+--JSON 
+--URI Patterns, values
+--Hypermedia 
+--Custom Methods
+Stateless requests.
+
+- URI patterns.
+- HTTP, request and responses
+- Query Paramters (Sorting and Limiting Fields) and Headers
+
+
+
+
+## API Access Control and Security
+Broken access control being a leading factor in OWASP top 10.
+--Validation, Securing and validating
 
 ALl the broken access control. Security & Authentication
+Authenticating locally, each endpoint. Validating request data types. Rejecting anything that doesnt match.
+
+Supporting API keys / JWTs
 
 Validation & Sanitisation
 
+Validating against Cross site request forgery
 
 
+Rate Limiting
+
+## Common API Implementation Practices
+--LROs
+Supporting Partial responses
+Data Retention
+
+
+
+## Exception handling and Error Logging
+Handling errors gracefully. Returning messages
+Returning correct status codes
+Keeping a log of failed sign ins etc (audit trails)
+
+
+## Filtering Responses
+
+
+## Caching
+
+
+## Versioning
