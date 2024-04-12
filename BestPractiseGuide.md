@@ -2,31 +2,9 @@
 
 This guide is not to enforce a rigious framework that cages developers in with the Do's and Don'ts of creating REST  APIS. The aim of my guide is to bring together all the various design and implementation strategies used across the industry into one, singular reference. 
 
-Employing proper design theories and patterns can, and often have, prevent future issues with scaling, maintainability and the consistency across the system.
+
 
 REST will be briefly discussed and how we can ensure our APIs adhere to those principles set by Roy Fielding, as well as the how we will utilise the HTTP Specification.
-
-
-```json
-	200 OK
-	Content-Type: application/json; charset…
-	Content-Length:…
-{
-    "bookID": 24,
-    "title": "Big Book of Knowledge",
-    "author": "Peter Jackson",
-    "pubDate": "2012-04-16",
-    "availability": "Available",
-    "links": [
-        {
-            "href": "",
-            "link": "",
-            "rel": ""
-        }
-    ]
-}
-
-```
 
 
 ## What’s REST?
@@ -199,6 +177,8 @@ TBD
 
 # Resource Oriented Design
 Resource Oriented APIs are modelled as a “resource hierarchy” where each endpoint is a simple resource, or a collection of resources. Where API functionality naturally maps to one of the standard methods, that method should be used in the API design.
+
+**Workflows, identifying the workflow and from there.The starbucks analagy is pretty good**
 
 Imagine you have been given the ownership of land, large enough for you to build your dream castle. You know that you want a keep to live in, surrounded by a large wall that can be manned by your loyal men and a moat to keep out the riffraff. Before instructing workers to begin building, it would be wise to check the surrounding areas for resources that could be used throughout the build and base their designs on what is available to use. It would be inefficient to use resources that were not relevant to the design requirements set.
 
