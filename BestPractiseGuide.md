@@ -34,11 +34,7 @@ https://bpg-library.com/books/4
     "author": "Rath Scollington",
     "pubDate": "1993-04-16",
     "availability": "Unavailable",
-    "_links": [
-        {
-            ...
-        }
-    ]
+    ...
 }
 ```
 
@@ -150,21 +146,25 @@ Some of the more popular formats of content types that should be supported are �
 For more information on the full current best standard for Media Type Specifications, visit [RFC 6838](https://www.rfc-editor.org/rfc/rfc6838).
 
 
-# Resource Oriented Design
-Resource Oriented APIs are modelled as a “resource hierarchy” where each endpoint is a simple resource, or a collection of resources. Where API functionality naturally maps to one of the standard methods, that method should be used in the API design.
+# Establishing the Exposed Resources (Was Resource-Oriented Design)
+Resource Oriented APIs are modelled as a “resource hierarchy” where each endpoint is a simple resource, or a collection of resources. Endpoints, what the client interacts with, mirrors distinct resource(s) and forms a cohesive hierarchy of resources. 
 
-**Workflows, identifying the workflow and from there.The starbucks analagy is pretty good**
+Principles to focus on when designing a resource-oriented API are:
+1. The expected resources the API can provide.
+2. The relationships and hierarchy between resources. 
+3. The schema of each resource (i.e, the fields each resource represents)
+4. The HTTP operations that can be executed on each resource.  
 
-Imagine you have been given the ownership of land, large enough for you to build your dream castle. You know that you want a keep to live in, surrounded by a large wall that can be manned by your loyal men and a moat to keep out the riffraff. Before instructing workers to begin building, it would be wise to check the surrounding areas for resources that could be used throughout the build and base their designs on what is available to use. It would be inefficient to use resources that were not relevant to the design requirements set.
+Developer's should initialize their design process by identifying the business entities and endpoints that will be exposed to the client prior to development. Having your design dependent on the resources you expect to expose allows for a simplistic interface that can adapt rapidly to evolving functionality.
 
-The same principles can be applied for designing a solid RESTful API, for a developer should initialize their design process by identifying the business entities and endpoints that will be exposed to the client prior to development. Having your design dependent on the resources you expect to expose allows for a simplistic interface that can adapt rapidly to evolving functionality. 
+For example, in a bookkeeping system, the main entities that may be exposed could be Authors, Books and Orders.
 
-For example, in a bookkeeping system, the main entities that may be exposed could be Authors and Books. To create a new Book, a HTTP POST request that contains the book information would be sent to our API. The following HTTP response would then indicate if the book was created, or if the process had failed.
+To create a new Book, a HTTP POST request that contains the book information would be sent to our API. The following HTTP response would then indicate if the book was created, or if the process had failed.
 
 | Example                                                   | Description |
 | --------------------------------------------------------- | ----------- |
 | [https://bpglibrary-official.com/books](https://bpglibrary-official.com/books)         | Good        |
-| [https://bpglibrary-official.com/create-book](https://bpglibrary-official.com/create-book) | Not good    |
+| [https://bpglibrary-official.com/create-book](https://bpglibrary-official.com/create-book) | Avoid    |
 
 It is important to note that a resource doesn’t have to be a single piece of data, for example the book resource might be comprised of multiple tables from a database, but the client would only see the returned object as a single entity. Developers should not, when designing their API, mimic their database relationships for it is the purpose of REST to model the entities and operations that the application can perform on those entities. The inner workings of the system should not be exposed to clients.
 
@@ -225,23 +225,11 @@ The returning body would like the example below.
 
 ```
 
-It may help the deisng process to envision what the resource hierarchy will look like as a chart, through the use of a diagrams. An example of which can be found below on the example “bpglibrary” API.
-
-![image info](./pics/rh.png)
-
  
 In the scenario used for this guide, the main API service 
-The main API service is “bpglibrary.com” that features two collection URIs, books and members. /books is the path to the book collection, and /books/10 would retrieve the book with an ID of 10. A RESTful API should also support parametrized URI paths, such as the books//{id} path and should behave similar to a network file path. Having the resources set in a hierarchical nature leads to a logical and easily understandable naming convention. 
+The main API service is “bpg-library.com” that features two collection URIs, books and members. /books is the path to the book collection, and /books/10 would retrieve the book with an ID of 10. A RESTful API should also support parametrized URI paths, such as the books//{id} path and should behave similar to a network file path. Having the resources set in a hierarchical nature leads to a logical and easily understandable naming convention. 
 
-Certain terms and words should be avoided when naming URIs, specifically:
--   elements
--   entries
--   instances
--   items
--   objects
--   resources
--   types
--   values
+
 
 A pitfall the example above can face is the over-expression of relationships between the different resources that are exposed. For example, each book has an author, and a client could navigate to a specific author via the path /books/{id}/author/, but it could also go in the other direction and the association between the author and each of their books could be retrieved via the path /authors/{name}. Building your API around these associations will quickly lead to confusion and become far larger than the scope originally required, to which the REST solution would be to use HATEOAS to enhance the discoverability of the resources in the API and how they can be manipulated.
 
@@ -258,6 +246,9 @@ Using REST, we can include hypermedia links in an API response to show clients r
 
 For example, if a client makes a request to retrieve a collection of books available in the system, the response will contain extra links that contains the information necessary to discover directly related resources and services.
 
+
+
+
 **EXAMPLE**
 ```json
 	200 OK
@@ -273,7 +264,15 @@ For example, if a client makes a request to retrieve a collection of books avail
         {
             "href": "",
             "link": "",
-            "rel": ""
+            "rel": "",
+
+            
+            "href": "bpg-library.com/books",
+            "action": "GET",
+            "rel": "books",
+            "types":["text/xml","application/json"]
+
+            
         }
     ]
 }
@@ -339,22 +338,24 @@ TLS will encrypt the data, authenticate the request to ensure that the client is
 
 On the Presentation Layers that allow for users to enter their own data for submission to the API, for example a sign-up form or to change an accounts detail, the front-end must be sanitised and validated so that no Injection styled attack can be used. Sanitisation is the practice of taking a users input and validating it so that any unsafe characters, i.e. escape characters in SQL, are removed before being transmitted.
 
-**EXAMPLE**
- of SQL injection attack.
-
  ```text
 POST https://bpg-library.com/books/4
+...
+{
+    "title": "The Catcher in the Rye",
+    "author": "J.D. Salinger",
+    "pubDate": "1951-07-16",
+    "availability": "Available'; DROP TABLE Books; --"
+}
 ```
 
+The "availability" field has, initially, a valid value, however with the use of the escape character " ' ", it can be manipulated to run malicious SQL code. In this example, it would delete the Books table.
 
 Data that is contained in the clients request should be mapped to an object that exists within the backend of the API. This allows for a safe and secure conversion of data for the server to deal with, in addition to sending back a bad request status code if a field does not match.
 
-Avoid using hardcoded request.getParameters to place data into queries for insertion into a database, first data should be mapped to an identical model of the object so that another layer of validation is ensured. 
+Avoid using hardcoded request.getParameters to place data into queries for insertion into a database. One way of doin this is to map data to an identical model of the object so that another layer of validation is ensured. 
 
-For example, the Book class is set out as a Model in this examples C# code.
-
-**EXAMPLE** - -????
-
+For example, the Book class is set out as such in this examples C#.
 ```code
 public class Book
 {
@@ -364,9 +365,9 @@ public class Book
     public DateTime PubDate { get; set; }
     public string Availability { get; set; }
 }
-
 ```
-**In my corresponding**
+
+Everytime a Book object is received in a request, the request body parameters that contains the JSON should have each individual value assigned to a new instance of the Book class. This allows for a clear and concise way of handling incoming data, as well as being heavily reusable.
 
 # Configuring Access Control
 Broken or misconfigured access control on APIs were in the top 6 of both the OWASP Web API & the API Security Risks in 2021 and 2023 respectively. The root causes of these issues stemmed from:
@@ -384,19 +385,25 @@ These are issues that, if properly addressed at the start, are easily identifiab
 ## Broken Access Control
 Broken Access Control had the most occurrences in the dataset collected by OWASP with over 318 thousand counts. This failure can lead to unauthorised access to information, ability to modify and destruct data or to perform business functions that are outside of a user’s privilege. 
 
+
+
 Access Control checks can be broken and bypassed by modifying the URL, internal application state or by using an attack tool that can modify a requests body. This can then allow bad actors to gain access to parts of the system that is typically unreachable by the user, such as editing or viewing someone else’s account, by elevating their own privilege to that as an admin when logged in as a user, or acting as a user whilst not being logged in. 
+
+**Example of a URI being used to access info
 
 Metadata can be manipulated, such as that JSON Web Tokens (JWT) can be tampered with by abusing their invalidation or a hidden field within the token modified.
 
-To prevent such attacks from occurring, developers should adopt the Least Privilege pattern, where a user’s default access level to any resource is set as “denied” until given permission explicit and that except for public resources, denying requests should be default. 
 
-Privilege should not be granted based on purely a single condition, i.e. a Boolean flag attached to the request, and should instead be set by a combination of conditions based on resource type.
+To prevent such attacks from occurring, developers should adopt the Least Privilege pattern, where a user’s default access level to any resource is set as “denied” until given permission explicit and that except for public resources, denying requests should be default. Privilege should not be granted based on purely a single condition, i.e. a Boolean flag attached to the request, and should instead be set by a combination of conditions based on resource type.
+
 
 If clients making DELETE requests, there must be some level of local authentication done on the endpoint to ensure that the clients level of access allows them to delete that resource. 
 
-**EXAMPLE**
+
 
 Web server directory listings must be disabled to ensure files such as the metadata and backup files are not present within web roots.
+
+
 
 REST endpoints should locally authenticate each request to minimise latency and reduce the coupling between services. Each Rest CALL is stateless and should check whether the caller is authorised to perform said action.
 
@@ -405,9 +412,6 @@ REST endpoints should locally authenticate each request to minimise latency and 
 Endpoints that are exposed to handle object identifiers, such as any endpoint that receives and ID of an object and performs any actions on said object, should implement access and object-level authorisation checks. These should validate whether the user who is logged in has permissions to perform the action on the object. When this isn’t done, it typically leads to unauthorised information discloser and the potential modification and destruction of all data.
 
 
-**EXAMPLE**
- of using endpoint using object identifier
-
 
 It is recommended that, rather than rely on an ID of an object, to use a separate field of GUID, or the Globally Unique Identifier. This is a 128-bit string that represents an extra ID for an object and can be used to identify information or objects.
 
@@ -415,8 +419,6 @@ It is recommended that, rather than rely on an ID of an object, to use a separat
 **EXAMPLE**
  of an endpoint that does not use any authorisation.
 
-**EXAMPLE**
- of a parameter that is modified reaching the system.
 
 
 Access Control can be furthered by having an allowlist of permitted HTTP methods, especially for user groups and levels of authentication. Requests that don’t match the allowlist should be responded with a HTTP response code 405 Example.
@@ -428,21 +430,26 @@ Access Control can be furthered by having an allowlist of permitted HTTP methods
 Public REST APIs that have no access control run the major risk of having its resources manipulated and farmed, leading to excessive bills for bandwidth and computing cycles. To avoid attacks such as Denial of Service, a lead cause of such effects, access tokens such as JSON Web Token (JWT), or API Keys, can be attached to a request so that the REST service can authenticate the API against either an identify provider or server storage.
 
 ### Whats a JWT?
-A JWT is a data structure that contains a set of claims that are used for access control decisions. Cryptographic should be attached to the token so that its integrity is protected. Developers could use Message Authentication Code to protect the integrity of the token, however if it is used then it should be kept in mind that any service that validate the JWTs can also be used to create new ones with the same key, meaning that all services that use the same key must trust each other mutually. Consequently, if one service is comprised, the rest are.
 
-JWTs must contain the following standard claims to be verified, however this is no definitive list of what must be contained within the token.
+A JSON Web Token is data structure that contains a set of claims that are used for access control decisions. Cryptographic should be attached to the token so that its integrity is protected. The official standard for a JWT is the [RFC7519](https://www.rfc-editor.org/rfc/rfc7519) 
 
-1.	The Issuer - Authorisation must be done on if the issuer is authorised.
-2.	The Audience -  Is the JWT relevant to the current service and target audience?
-3.	The Expiration Time - Is the time before the end of the validity period?
-4.	The Not Before Time - Is the current time after the start of the validity period?
+Developers could use Message Authentication Code to protect the integrity of the token, however if it is used then it should be kept in mind that any service that validate the JWTs can also be used to create new ones with the same key, meaning that all services that use the same key must trust each other mutually. Consequently, if one service is comprised, the rest are.
 
+JSON Web Tokens carry information to identify the client and are encoded to ensure it's safety.
 
+An example of a JWT from the [JWT.IO](https://jwt.io/#debugger) shows that the structure is as followed:
 
-**EXAMPLE**
- of JWT being attached and verified.
+```text
+[Base64(HEADER)].[Base64(PAYLOAD)].[Base64(SIGNATURE)]
 
 
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.
+TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+```
+
+
+There are a *lot* of caveats to JWTs, and for a more in-depth analysis on their security issues, visit the [OWASP JWT Cheatsheet](https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html).
 
 ### Whats an API Key?
 Primarily used as an authentication to access an APIs service, API keys are used to ensure that the user making the request is verified within the system and that the API key is valid and verified within the system. 
@@ -451,10 +458,11 @@ Primarily used as an authentication to access an APIs service, API keys are used
 -	They must not be publicly accessible.
 -	Violation of the user agreement or through unauthorized access of services would result in the API key to be revoked.
 
-API keys should only be used within private environments and should not be used or trusted with third-party clients to access your API unless strictly necessary. Remember, anyone with an API key that is not updated or changed regularly can have access to the system. 
+API keys should only be used within private environments and should not be used or trusted with third-party clients to access your API unless strictly necessary. 
+
+**Remember, anyone with an API key that is not updated or changed regularly can have access to the system.**
 
 Timestamps could be added to the header of the request so that the server can compare the current timestamp to the request and can only accept requests if it is within a set timeframe, i.e. 30 seconds. 
-
 
 
 ## Data Retention
@@ -467,19 +475,6 @@ APIs should adopt a data retention policy, and a suitable "undelete" function wh
 - For whole database tables, large resources or BLOBS, developers should adopt a 7-day minimum retention period.
 
 During the data retention window, users must be able to undelete their data without any data loss. 
-
-# Decoupling Admin and Client Services
-Broken Access Control can be abused by allowing users without authentication or authorisation to pose as users or admins without permission by extraneous methods. 
-
-Splitting up the admin and user access with different URLS means that an attacker cannot just force browse to target URLS. Management and admin endpoints should not, under any circumstance, be exposed to the internet or in root calls of discoverability (i.e., HATEOS).
-
-
-**EXAMPLE**
- of admin URL that can be accessed with and without verification
-
-**EXAMPLE**
- of Admin Layer, and Client Layer.
-
 
 
 # Cross-Site Request Forgery
@@ -501,30 +496,46 @@ As we are focused on HTTP RESTful APIs, we want to ensure that all communication
 The below sections cover certain practices and standards that have been ascertained through my research. The main discussion points are: 
 
 - Adhering to REST and HTTP Principles.
-- Handling different types of requests to a RESTful API.
-- Identifying common problems faced by RESTful APIs.
+- Handling different types of requests.
+- Solutions or patterns to solve common problems faced by RESTful APIs.
 
 ## Idempotent Requests
-There are certain HTTP methods that, if performed numerous times on the same resource, should result in that resource being in the same state it was prior. HTTP Methods like GET, PUT, DELETE, HEAD and PATCH are all methods that are idempotent.
+There are certain HTTP methods that, if performed numerous times on the same resource, should result in that resource being in the same state it was prior. HTTP Methods like GET, PUT, DELETE and HEAD are all methods that are idempotent.
 
 For example, sending multiple GET requests to the same URI should result in the same object being retrieved, or a DELETE request to return either 204 for the first request, and 404 for subsequent requests.
 
 
-**EXAMPLE**
+```text
+GET https://bpglibrary-official.com/books
 
 
-POST and PATCH would be considered not idempotent, for both these requests could cause partial side effects within the system beyond creating or updating a resource. 
+DELETE https://bpglibrary-official.com/books/4
+```
 
-**EXAMPLE**
- of Post and how to avoid (Unique ID, checking a UUID)
 
-**EXAMPLE**
- of Patch
+These two examples are requests that are *idempotent*. Using these requests consecutively would not have any side-effects on the system, as DELETE can only be executed once before a 204-No Content Status Code is returned.
+
+
+
+POST would be considered not idempotent, for it could cause partial side effects within the system beyond creating a resource. For example, an Order being created could cause some functionality to fire off, and that changes a value elsewhere.
+
+PATCH requests are not inherently idempotent, but do require some thought behind the design of such a request to ensure that there are no side-effects within the system.
+
+Take a PATCH request for example. The client wants to update the 4th Books Author field, and would use a request formatted similar to the one below:
+
+```text
+PATCH https://bpglibrary-official.com/books/4
+Content-Type: application/json...
+{
+  "author": "Dylan Jones"
+}
+```
+This would result in the 4th Book having its Author value changed to "Dylan Jones". If this same request repeatedly with the same body, the Author field would remain unchanged.
 
 RESTful APIs that utilise HTTP should ensure that idempotent methods cause no side effects within the system, otherwise it is not REST-adherant.
 
 
-## Long Running Operation Response
+## Long Running Operations
 
 Sometimes a user’s request can take longer than expected to handle and process correctly, to which the API may return a response to the client that states that the operation is in process. The API should return a 202 Accepted Status code to indicate the request has been received and initiate a separate operation to perform the work needed. 
 
@@ -532,23 +543,31 @@ The response must also provide a method of monitoring the progress of the reques
 
 This decouples the long-running process from the initial request and allows clients to retrieve the results when wanted after execution.
 
-**Example** of user making a request to get a large amount of data. And the response is a 202, with a URI that shows the progress of the operation. 
-Client makes call -> Send response of 202, give URI for progress on the operation ->
-
 
 ## Ensuring Stateless Requests
 Stateless Requests are when each request must contain all the information required to complete that request, each request is isolated from another and the server will not retain any context between consecutive requests. 
 
 This means that each request will contain the all information necessary, and that the system shouldn’t have to search further than the requests body and header tags to authorise the action the client wants to perform.
 
-A request which does not contain this information should be responded with a 401 status code, including a message on what the user requires to be authenticated to access the resource.
+A request which does not contain this information should be responded with a 401-Unauthorized, including a message on what the user requires to be authenticated to access the resource.
 
-If the client is attempting to access a restricted resource or operation, the request must contain the required information to authenticate their access level. This could be done with a JWT or an API key.
+If the client is attempting to access a restricted resource or operation, the request must contain the required information to authenticate their access level. This could be done with a [JWT or an API key](#tokens-and-api-keys).
+
+To demonstrate a "Stateless" request, take the below example:
 
 
-**EXAMPLE**
- of a Stateless request including authentication, the body of data and anything else needed.
+```text
+POST https://bpglibrary-official.com/v1/books
+Authorization: Bearer...
+Content-Type: application/json
+{
+  "title": "Dylans New Book"...
+}
+```
 
+The request contains a valid URI & Content Type, an accepted HTTP method, relevant Authorisation and the body of data that is to be sent to the API.
+
+This is what is meant by **stateless**, that each request is able to be processed without reliance on any prior.
 
 
 ## Combatting Excessive Resource Consumption and Chatty APIs
@@ -563,9 +582,6 @@ Chatty APIs are APIs which expose a large number of small resources, requiring t
 
 We can identify a "chatty" API by the following example:
 
-The bookkeeping system has an endpoint to retrieve a books Author, Title, ISBN, and Publish Date. The client have to make a request to be accepted like below to return the chosen books data.
-
-**Example** of code to accept bookId/fields
 
 ```text
 
@@ -583,22 +599,40 @@ The bookkeeping system has an endpoint to retrieve a books Author, Title, ISBN, 
 
 ```
 
+The bookkeeping system has an endpoint to retrieve a books Author, Title, ISBN, and Publish Date. The client have to make a request to be accepted like below to return the chosen books data.
+
+
+
 This type of issue can be abused, and if there is a lack of strategies to mitigate the effect of this issue being abused, it could critically cost the API in both down time and monetary value.  
 
 It could also cause a denial of service for other clients due to resource starvation.
+
 
 
 ### Limiting the Rate of Requesting (Rate Limiting)
 
 An API that does not limit client interactions or resource consumption can face bad clients crafting their requests in such a way that can overload the system, impacting the performance and the responsiveness. A specially crafted API request could also expose system functionality, leading to authentication breaking and data leakage.
 
-Rate limiting is a simple way of ensuring clients cannot make too many requests at once, or within a certain period on a given resource / operation. Excessive resource consumption is when 
+Rate limiting is a simple way of ensuring clients cannot make too many requests at once, or within a certain period on a given resource / operation. Excessive resource consumption is when there are **no** safeguards in place, and the system allows for an unlimited amount of requests to be sent to a given resource.
 
-**Example** request. Number of results to return. How many times the request is sent. Costs came from it being ran too much. Using a third party 
+Take, for example, the request below:
 
-An example request that could abuse the systems resources may look like this:
 
-**Example** request of abusing it.
+```text
+GET https://bpg-library.com/v1/orders/
+...
+max_results: 50
+```
+
+Here, the client is requesting to retrieve a maximum of 50 Order records. If this value is not validated against, the client could alter the request to look like:
+
+```text
+GET https://bpg-library.com/v1/orders/
+...
+max_results: 1000
+```
+
+This request abuses the lack of rate limiting, and allows clients to retrieve excessive numbers of records from the API.
 
 
 To combat such avenues of exploitation on your services, there are methods and patterns that developers can consider:
@@ -612,8 +646,6 @@ To combat such avenues of exploitation on your services, there are methods and p
 -	Using HATEOAS to lower the amount of calls a client must make to discover the functionality for a given resource.
 
 -	Having a finite number of times that requests can be sent within a timeframe before a 405-status code is sent.
-
-
 
 
 ## Custom Methods
@@ -648,7 +680,7 @@ https://bpg-library.com/v1/books/3:rent
 Or, if we wanted to remove the Order with the ID of 3, we can call the below URI to use the "remove" custom method.
 
 ```text 
-https://bpg-library.com/v1/order/3:remove
+https://bpg-library.com/v1/orders/3:remove
 ```
 
 Before using a custom method to achieve functionality, developers should ensure that using a custom method is needed instead of standard methods. For example, if the client wants to query a resource with different parameters, a standard GET would do fine, or to change a resources property a PUT would suffice. Only when it is necessary should a custom method be use.
@@ -679,7 +711,7 @@ Developers should follow these patterns when developing their API's exception an
 
 -	Use a standardised error response format.
 
--	Usage of HTTP Status Codes.
+-	Usage of [HTTP Status Codes](#http-status-codes).
 
 Developers should not, under any circumstance, alert the user by making the logging and alerting events visible to the user as it will leave leak vulnerable information.
 
@@ -781,7 +813,6 @@ GET https://bpg-library.com/books?fields=BookID,Title
 ```
 
 
-
 To find more information on this topic, especially the legality side, visit [this link](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/data-protection-principles/a-guide-to-the-data-protection-principles/the-principles/storage-limitation/#:~:text=The%20UK%20GDPR%20does%20not%20dictate%20how%20long%20you%20should,how%20long%20you%20need%20it).
 
 
@@ -794,7 +825,7 @@ By including caching in the API, it optimises the network usage and improves the
 
 High performant RESTful APIs must contain caching capabilities. Developers should take the following points into account when implementing caching and improving optimisation.
 
--GETS must be cacheable by default, unless the client specifies otherwise, or a certain condition has been met. 
+- GETS must be cacheable by default, unless the client specifies otherwise, or a certain condition has been met. 
 
 - Sensitive Data, such as user profile details, passwords, admin details, should **NOT** be cacheable. 
 
@@ -814,9 +845,12 @@ The common Cache-Control headers that should be supported  are:
 | Must-Revalidate | Indicates the cached response must be revalidated before being used.   |
 
 
-Cached responses may become “stale” once they can no longer be used as their current state. It requires a request to the server to either retrieve the data again, or to validate the caches contents.Below is an example of a request, and the response that specifies Control-Control headers.
+Cached responses may become “stale” once they can no longer be used as their current state. It requires a request to the server to either retrieve the data again, or to validate the caches contents.
+
+Below is an example of a request, and the response that specifies Control-Control headers.
 
 
+**Example**
 **THIS WOULD BE A REQ**
 ``` JSON
 	200 OK
@@ -844,29 +878,27 @@ In addition to Cache-Control headers, a response may also contain an ETag, or an
 
 The ETag header is an indicator for the version of a given resource. Each time a resource is modified or changed, the ETag value must change as well. When a response contains an ETag and is cached by the client, the ETag should also be stored. 
 
-**IfMatch header**
 
+Clients would use the [If-None-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match) header to include the ETag into a request, to which the server will then attempt to match with the ETag stored on the server. If both values match, a 304 Not Modified status code can be returned without a body to indicate to the client that the cached version is not stale and can still be used.
 
-Clients would use the If-None-Match header to include the ETag into a request, to which the server will then attempt to match with the ETag stored on the server. If both values match, a 304 Not Modified status code can be returned without a body to indicate to the client that the cached version is not stale and can still be used.
+ETags can be strongly or weakly validated. Weakly validated ETags are prefixed with a W/, which are easy to generate but are not very useful for comparing resource states. In context, a strong validation means that the two resources with the same ETag are identical, byte-for-byte. Strongly validated ETags allow for caching of partial responses.
 
-**Example** of an E-tag 
-
-
-If the values DON’T match, so the ETag sent by client isn’t matching with the server’s resource, the cached version should be disregarded and the new version cached instead. 
-
-ETags can be strongly or weakly validated. Weakly validated ETags are prefixed with a W/, which are easy to generate but are not very useful for comparing resource states.
-
-**Example** of Strong and Weak etag (like google)
 Strong validators are ideal for comparing the resource states, but difficult to generate efficiently.  
 
-In context, a strong validation means that the two resources with the same ETag are identical, byte-for-byte. Strongly validated ETags allow for caching of partial responses.
+An example by [Mozilla Devloper](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) demonstrates how a Strong and Weak Etag is represented
 
-Two resources with the same weakly validated ETag means that the representations are semantically the same, but not byte-for-byte, meaning it should not be allowed for caching. **What does this even mean??**
+```text
+ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4" 
+ETag: W/"0815"
+```
 
-Can use an MD5 Hash generator < hyperlink https://www.md5hashgenerator.com/>
-Developers would be expected to have a service or library that can create the ETag. 
 
-There should no spaces, double quotes where not specified or backslashes within the ETag
+If the values DON’T match, i.e the ETag sent by client does not match with the server’s resource, the cached version should be disregarded and the new version cached instead. 
+
+[If-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Match) is another header to be used with ETags which compares the ETag attached to the request to what is stored with the resource. It allows for clients to specify what state of the resource they wish to access.
+
+If a value does not match what is contained in the If-Match header, a 412-Precondition Failed should be returned.
+
 
 
 # Versioning
@@ -891,11 +923,14 @@ https://bpglibrary-official.com/...
 ```
 
 
-Changes would be represented as a new resource or operation that can be executed without reliance on existing functionality.
+Changes would be represented as a new resource or operation that can be executed without reliance on existing functionality. 
+
+Clients **must** be made aware of the new functionality. Otherwise, how else will they know to use it?
 
 No versioning means that client applications will continue to function as intended without alteration of URIs, however new functionality added may not be utilised by the client if they are unaware, as well causing issues with clients if their applications are not fitted to handle new or changed fields.
 
 If more radical changes are made to an API, such as removing fields or renaming them, the relationship between the resources will have changed and can possibly interrupt a client’s usage.
+
 Due to this, this method may not be the best fit. The following approaches may be more suitable in this situation.
 
 ## Versioning through the URI 
@@ -906,84 +941,88 @@ The URI for each resource exposed will include a version indicator of the API. F
 https://bpglibrary-official.com/v2/books 
 ```
 
-**EXAMPLE**
- of the URI having the versioning. Response.
+And the response body returned would contain a collection of Books in JSON matching the API-Version 2 Schema for Books.
+
+```JSON
+{
+  "books": [
+    {
+      "id": 1,
+      "title": "The Great Gatsby",
+      "author": "F. Scott Fitzgerald",
+      "pubDate": "1960-07-11",
+    },
+    {
+      "id": 2,
+      "title": "To Kill a Mockingbird",
+      "author": "Harper Lee",
+      "pubDate": "1945-08-11",
+    }
+  ],
+    "links": [
+        {
+            ...
+        }
+    ]
+}
+
+```
+
+URIs from previous versions must still be usable by the client, which does mean that we must violate the principle of having each URI refer to a unique resource. 
 
 
-URIs from previous versions must still be usable by the client, which does mean that we must violate the principle of having each URI refer to a unique resource.
+The previous URIs should return the resource that is the same as their original schema. For example, take the below URI that will call the API-Version 1 collection of Books.
 
-**EXAMPLE**
- of the URI from a prior version.
+```text
+https://bpglibrary-official.com/v1/books 
+```
+```JSON
+{
+  "books": [
+    {
+      "id": 1,
+      "title": "The Great Gatsby",
+      "author": "F. Scott Fitzgerald",
+    },
+    {
+      "id": 2,
+      "title": "To Kill a Mockingbird",
+      "author": "Harper Lee",
+    }
+  ]
+}
 
-The previous URIs should return the resource that is the same as their original schema
+```
 
-**EXAMPLE**
- of the response body that matches the old schema.
 
 As you can probably see, this can get quite cumbersome and complicated as the API grows and evolves. HATEOAS would be complex to implement as each link would also have to include the version number.
 
 ## Versioning through a Custom Request Header
 An easier, more consistent method of versioning the API is to include the API version indicator in the request headers. This method avoids the complexity of including the version for resources across the versions.
 
-Lets say we have a versioned API and that our Orders...
+Lets say we have a versioned API and that the client wants to return Order data from the API-Version 1. They would include this header in their request so that the API can verify and differentiate between the version to use.
 
 ```text
- GET   https://bpglibrary-official.com/v1/orders/3
- Custom-Header: api-version=2
+ GET   https://bpglibrary-official.com/orders/3
+ Custom-Header: api-version=1
  ...
 ```
 
-The response for the version 1 will look like below:
 
-``` JSON
-	200 OK
-    Content-Length: ...
-{
-    "id": 3,
-    "bookID": 22,
-    "memberID": 3,
-    "price":9.99,
-    "links": [
-        {
-            ...
-        }
-    ]
-}
 
-```
-
-And now, lets say the client wants to call the API version 2.0, as that contains more fields than the original version.
+Now, lets say the client wants to call the API version 2.0, as that contains more fields than the original version. They would add the correct version indicator to the Custom Header.
 
 
 ```text
- GET   https://bpglibrary-official.com/v2/orders/3
+ GET   https://bpglibrary-official.com/orders/3
  Custom-Header: api-version=2
  ...
 ```
 
 
-``` JSON
-	200 OK
-    Content-Length: ...
-{
-    "id": 3,
-    "bookID": 22,
-    "memberID": 3,
-    "orderType":2,
-    "price":9.99,
-    "dateOrdered":"2024-04-10" ,
-    "links": [
-        {
-            ...
-        }
-    ]
-}
+Again, the object schema must match what is in the version being set **UNLESS** it is a conditional value.
 
-```
-
-As like previous versionings, the object schema must match the version being set unless it is a conditional value.
-
-All clients are required to do are to include that custom header with their targeted API version.
+All clients are required to include that custom header with their targeted API version. If it is omitted, or left out, a *Default* Version can be used, which is essentially just 
 
 If the API version is not included, a status code of 400 and an relevant message describing the issue must be returned to the client. 
 
@@ -1000,21 +1039,17 @@ https://bpglibrary-official.com/v1/books/4/rent
 ```
 
 
-If the functionality is still available, but is going to be deprecated in a weeks’ time, the response may look like:
-
-**EXAMPLE**
- of response and its status code.
+If the functionality is still available, but is going to be deprecated in a weeks’ time, the response **should** contain a similar format as below to indicate to the user when this feature will be removed from service.
 
 
 ```text
-<description of Service> will retire on <date> (url) where the URL could show more info.
+<description of Service> will retire on <date> (url)
 ```
+(url) is optional and can be used to show more information on the matter for the client.
+
+If the functionality has fully deprecated and is no longer used by the API, the API must return a response that contains a 410-Gone status code.
 
 
-If the functionality has fully deprecated and is no longer used by the API, the API must return a response that contains a 410-status code and a response body of:
-
-**EXAMPLE**
- of response from a deprecated service.
 Additionally, developers should be removing unused dependencies and libraries that are deprecated or no longer supported. Reviews of used libraries and dependencies should be conducted regularly.
 
 
