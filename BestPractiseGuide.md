@@ -149,6 +149,16 @@ For more information on the full current best standard for Media Type Specificat
 # Establishing the Exposed Resources (Was Resource-Oriented Design)
 Resource Oriented APIs are modelled as a “resource hierarchy” where each endpoint is a simple resource, or a collection of resources. Endpoints, what the client interacts with, mirrors distinct resource(s) and forms a cohesive hierarchy of resources. 
 
+For example, the URI:
+```text
+GET https://bpg-library.com/books
+```
+Will return the the book collection, and
+```text
+GET https://bpg-library.com/books/24
+```
+Will return the book with an ID of 24. This helps create a hierarchy of resources that can have its routing (the URI) paramterized.
+
 Principles to focus on when designing a resource-oriented API are:
 1. The expected resources the API can provide.
 2. The relationships and hierarchy between resources. 
@@ -231,7 +241,10 @@ The main API service is “bpg-library.com” that features two collection URIs,
 
 
 
-A pitfall the example above can face is the over-expression of relationships between the different resources that are exposed. For example, each book has an author, and a client could navigate to a specific author via the path /books/{id}/author/, but it could also go in the other direction and the association between the author and each of their books could be retrieved via the path /authors/{name}. Building your API around these associations will quickly lead to confusion and become far larger than the scope originally required, to which the REST solution would be to use HATEOAS to enhance the discoverability of the resources in the API and how they can be manipulated.
+A pitfall the example above can face is the over-expression of relationships between the different resources that are exposed. For example, each book has an author, and a client could navigate to a specific author via the path /books/{id}/author/, but it could also go in the other direction and the association between the author and each of their books could be retrieved via the path /authors/{name}. 
+
+
+Building your API around these associations will quickly lead to confusion and become far larger than the scope originally required, to which the REST solution would be to use HATEOAS to enhance the discoverability of the resources in the API and how they can be manipulated. It is better to keep it simple across the system rather than unnecessary complexity.
 
 
 ## Resource Discovery 
@@ -241,15 +254,12 @@ HATEOAS, or Hypermedia as the Engine of Application State, is an architectural c
 
 The term “hypermedia” refers to content that contains any link to any other forms of media, mainly text, images, or movies. 
 
-Using REST, we can include hypermedia links in an API response to show clients related resources dynamically. Each HTTP GET request should return the information to find the resources directly related to the requested object. We do this through using hyperlinks in the response, and they provide enough information for the client to describe what operations can be done on each of the related resources.
+Including Hypermedia links in the response shows clients related resources dynamically. Each HTTP GET request should return the information to find the resources directly related to the requested object. We do this through using hyperlinks in the response, and they provide enough information for the client to describe what operations can be done on each of the related resources.
 
 
-For example, if a client makes a request to retrieve a collection of books available in the system, the response will contain extra links that contains the information necessary to discover directly related resources and services.
+For example, if a client makes a request to retrieve the books with the ID of 24, the response will contain extra links that contains the information necessary to discover directly related resources and services.
 
 
-
-
-**EXAMPLE**
 ```json
 	200 OK
 	Content-Type: application/json; charset…
@@ -262,24 +272,30 @@ For example, if a client makes a request to retrieve a collection of books avail
     "availability": "Available",
     "links": [
         {
-            "href": "",
-            "link": "",
-            "rel": "",
-
-            
-            "href": "bpg-library.com/books",
+            "rel": "self",
+            "href": "https://bpg-library.com/books/24",
             "action": "GET",
-            "rel": "books",
-            "types":["text/xml","application/json"]
-
-            
-        }
+            "types": ["text/xml", "application/json"]
+        },
+        {
+            "rel": "self",
+            "href": "https://bpg-library.com/books/24",
+            "action": "PUT",
+            "types": ["application/x-www-form-urlencoded"]
+        },
+        {
+            "rel": "self",
+            "href": "https://bpg-library.com/books/24",
+            "action": "DELETE",
+            "types": []
+        },
+        ...
     ]
 }
 
 ```
 
-Hypermedia links are required to be in an array of “links” in the response body. 
+Hypermedia links are required to be in an array of “links” in the response body. This can be indicated by "links" or "_links".
 
 We use the [RFC8288](https://www.rfc-editor.org/rfc/rfc8288) standard as a framework for building links that define the relationships of a given resource. It states that hypermedia links must contain the following properties:
 
@@ -371,57 +387,77 @@ Everytime a Book object is received in a request, the request body parameters th
 
 # Configuring Access Control
 Broken or misconfigured access control on APIs were in the top 6 of both the OWASP Web API & the API Security Risks in 2021 and 2023 respectively. The root causes of these issues stemmed from:
+
 - Broken access control.
+
 - Insecure design practices.
+
 - Lack of identification and authentication on API endpoints.
-- Lack of or failure to correctly apply cryptographic encryption to secure the data stored.
+
 - Request bodies being modified prior to reaching the API with incorrect or malicious data.
+
 - Failure to correctly log and monitor events, such as errors and authentication failures that have occurred.
+
 - Outdated components still being active.
+
 - No sanitation on data or procedures in place to mitigate data integrity failing.
 
 These are issues that, if properly addressed at the start, are easily identifiable and fixable by employing the correct design patterns and methodologies that are stated below.
 
 ## Broken Access Control
-Broken Access Control had the most occurrences in the dataset collected by OWASP with over 318 thousand counts. This failure can lead to unauthorised access to information, ability to modify and destruct data or to perform business functions that are outside of a user’s privilege. 
+Broken Access Control had the [most occurrences](https://owasp.org/Top10/) in the dataset collected by OWASP with over 318 thousand counts. 
 
+Broken access control could allow unathenticated users access to:
+- Restricted resources and/or information.
+- The ability to modify or destruct data.
+- To peform business functions that are outside of a user’s privilege. 
 
 
 Access Control checks can be broken and bypassed by modifying the URL, internal application state or by using an attack tool that can modify a requests body. This can then allow bad actors to gain access to parts of the system that is typically unreachable by the user, such as editing or viewing someone else’s account, by elevating their own privilege to that as an admin when logged in as a user, or acting as a user whilst not being logged in. 
 
-**Example of a URI being used to access info
+An example from the [OWASP Top 10 Security Risks for APIs](https://owasp.org/Top10/A01_2021-Broken_Access_Control/#example-attack-scenarios) shows an attacker that can simply modify the browsers paramters in the query to send whatever account value they want.
 
-Metadata can be manipulated, such as that JSON Web Tokens (JWT) can be tampered with by abusing their invalidation or a hidden field within the token modified.
+```text
+ https://example.com/app/accountInfo?acct=notmyacct
+```
+
+If this is not properly validated, the attacker could gain access to any users account.
+
+To put it simply, if a client can simple force itself through into the system, or an unauthenticated user can access restricted resolurces, this is a serious flaw.
+
+-----
+To prevent such attacks from occurring, developers should adopt the [Least Privilege](https://www.cloudflare.com/en-gb/learning/access-management/principle-of-least-privilege/)
+pattern, where a user’s default access level to any resource is set as “denied” until given permission explicit and that except for public resources, denying requests should be default. Privilege should not be granted based on purely a single condition, i.e. a Boolean flag attached to the request, and should instead be set by a combination of conditions based on resource type.
 
 
-To prevent such attacks from occurring, developers should adopt the Least Privilege pattern, where a user’s default access level to any resource is set as “denied” until given permission explicit and that except for public resources, denying requests should be default. Privilege should not be granted based on purely a single condition, i.e. a Boolean flag attached to the request, and should instead be set by a combination of conditions based on resource type.
+
+Insecure Design is the fourth most identified security concern in the [OWASP Top 10 Security Risks for APIs](https://owasp.org/Top10/A05_2021-Security_Misconfiguration/). 
+
+An [example](https://owasp.org/Top10/A04_2021-Insecure_Design/#example-attack-scenarios) from the OWASP guide shows how Insecure Design could be abused by clients: 
+
+```text
+Scenario #2: A cinema chain allows group booking discounts and has a maximum of fifteen attendees before requiring a deposit. Attackers could threat model this flow and test if they could book six hundred seats and all cinemas at once in a few requests, causing a massive loss of income.
+```
+
+The main methods that help prevent an abuse of insecure design practice are:
+
+- Clients should be locally authenticated on each request to minimise latency and reduce the coupling between services. 
+
+- Each Rest CALL is stateless and should check whether the caller is authorised to perform said actiod on that resource.
+
+- Enforce [Rate Limiting](#limiting-the-rate-of-requesting-rate-limiting) on all incoming requests.
 
 
-If clients making DELETE requests, there must be some level of local authentication done on the endpoint to ensure that the clients level of access allows them to delete that resource. 
-
-
-
-Web server directory listings must be disabled to ensure files such as the metadata and backup files are not present within web roots.
-
-
-
-REST endpoints should locally authenticate each request to minimise latency and reduce the coupling between services. Each Rest CALL is stateless and should check whether the caller is authorised to perform said action.
-
-**EXAMPLE**
+---
 
 Endpoints that are exposed to handle object identifiers, such as any endpoint that receives and ID of an object and performs any actions on said object, should implement access and object-level authorisation checks. These should validate whether the user who is logged in has permissions to perform the action on the object. When this isn’t done, it typically leads to unauthorised information discloser and the potential modification and destruction of all data.
 
 
 
-It is recommended that, rather than rely on an ID of an object, to use a separate field of GUID, or the Globally Unique Identifier. This is a 128-bit string that represents an extra ID for an object and can be used to identify information or objects.
+It is recommended that, rather than rely on an ID of an object, to use a [GUID](https://guid.one/guid), or the Globally Unique Identifier. This is a 128-bit string that represents an extra ID for an object and can be used to identify information or objects.
 
 
-**EXAMPLE**
- of an endpoint that does not use any authorisation.
-
-
-
-Access Control can be furthered by having an allowlist of permitted HTTP methods, especially for user groups and levels of authentication. Requests that don’t match the allowlist should be responded with a HTTP response code 405 Example.
+Access Control can be furthered by having an allowlist of permitted HTTP methods, especially for user groups and levels of authentication. Requests that don’t match the allowlist should be responded with a HTTP response code 405-Method Not Allowed.
 
 
 ## Tokens and API Keys
@@ -849,9 +885,10 @@ Cached responses may become “stale” once they can no longer be used as their
 
 Below is an example of a request, and the response that specifies Control-Control headers.
 
+``` text
+GET https://bpglibrary-official.com/books/44
+```
 
-**Example**
-**THIS WOULD BE A REQ**
 ``` JSON
 	200 OK
     Cache-Control: max-age=1000, private
@@ -872,6 +909,7 @@ Below is an example of a request, and the response that specifies Control-Contro
 
 ```
 
+The response indicates that the response can be cached for a maximum of 1000 seconds, and that it is only for the clients use as indicated by the "private" value.
 
 ### ETags
 In addition to Cache-Control headers, a response may also contain an ETag, or an Entity Tag. Think of it as the digital fingerprint of the resource. 
