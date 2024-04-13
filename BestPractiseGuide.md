@@ -14,7 +14,7 @@ This guide focuses on the usage of HTTP as the applications protocols when desig
 
 A RESTful API contains resources, which can be representations of data, objects or a service that is accessible by the user.
 
-- Every resource has a unique identifier, which is used to identify the resource. This is called the Uniform Resource Identifier.
+- Every resource has a unique identifier. This is called the Uniform Resource Identifier.
 
 
 ```text
@@ -40,16 +40,16 @@ https://bpg-library.com/books/4
         }
     ]
 }
-
 ```
 
-- RESTful API Client-Server communications are classed as stateless. Each request is treated as independent to any other, and it must contain the entirety of the information required for the request to be processed. There are no client sessions, and the server will never rely on previous requests from clients. Having each request being atomic in nature allows for any server can handle any request as there are no session-related dependencies, as well as making the API less complex.
+- RESTful API Client-Server communications are classed as *stateless*. Each request is treated as independent to any other, and it must contain the entirety of the information required for the request to be processed. There are no client sessions, and the server will never rely on previous requests from clients. Having each request being atomic in nature allows for any server can handle any request as there are no session-related dependencies, as well as making the API less complex.
 
 - Responses should be labeled for caching or not appropriately. If the response is cacheable, the client should then be able to reuse that response data later for a specific length of time.
 
-- RESTful APIs should each component organized into layers, for example the client would interact with the Presentation Layer (The UI), and that would interact with the Application Layer.
+- RESTful APIs should each component organized into layers, for example the client would interact with the Presentation Layer (The UI), and that would interact with the Application Layer. 
 
-- Clients should be able to navigate throughout the API without prior knowledge of the applications endpoints, and that with a single URI the application should dynamically attach relevant resources via hyperlinks. This is called Hypermedia as the Engine of Application State(HATEOAS).
+
+- Clients should be able to navigate throughout the API without prior knowledge of the applications endpoints, and that with a single URI the application should dynamically attach relevant resources via hyperlinks. This is called *Hypermedia as the Engine of Application State(HATEOAS).*
 
 
 ```json
@@ -70,13 +70,13 @@ https://bpg-library.com/books/4
         "types":["text/xml","application/json"]
     },
     "search": { 
-        "href": "bpg-library.com/books/",
-        "title": "Search for books",
-        "method": "POST",
+        "href": "bpg-library.com/books",
+        "action": "POST",
+        "title": "Add a book",
+       
     }
   }
 }
-
 ```
 
 We can measure an API's adherence to the REST Principles by using the [Richardson Maturity Model for Web APIs](https://martinfowler.com/articles/richardsonMaturityModel.html). Created in 2008 and designed to break down the main elements of the REST approach into three simple steps.
@@ -93,7 +93,7 @@ Level 3 would correlate to having a truly RESTful API that encompasses all of Fi
 # HTTP Specifciation
 REST is not HTTP, and the two should not be mixed up by being considered the same thing. REST is not reliant upon any protocol, but we make use of the HTTP application protocols as it is the most popular platform for REST API implementation.
 
-It also enables client applications to interact with your API seamlessly, for almost all languages can generate and parse HTTP requests and responses.
+It also enables client applications to interact with your API seamlessly, for almost all languages can generate and parse HTTP requests and responses. 
 
 
 ## HTTP Status Codes
@@ -124,21 +124,12 @@ Correct HTTP status codes must be used for all responses by the API to indicate 
 | DELETE | Delete resource                       | 204-No Content; avoid 404-Not Found     |
 
 
-
-
 If a user is forbidden from access, i.e not authorised, a 403-Forbidden should be returend.
-
 
 Some client requests may have mismatching data types to what is expected in the API, or perhaps set a Content-Length 
 
 
-Delete requests?
-
-
-
-
 For requested resources who have had their URL changed, the status code 301 - Moved Permanently / 302 - Found (Moved Temporarily) should be returned.
-
 
 
 
@@ -157,22 +148,6 @@ Some of the more popular formats of content types that should be supported are �
 
 
 For more information on the full current best standard for Media Type Specifications, visit [RFC 6838](https://www.rfc-editor.org/rfc/rfc6838).
-
-## Data Types
-Data types supported within a RESTful web API should conform to those that are universal in usage for implementing the API as well as what to expect from clients.  This includes insuring that certain types of data remain static, mainly:
-
-
-| Data Type | Format       |
-|-----------|--------------|
-| Integer   | Int32 / Int64|
-| Number    | Float        |
-| Number    | Double       |
-| Text      | String       |
-
-
-### Why do we need to standardize data types?
-TBD
-
 
 
 # Resource Oriented Design
@@ -206,8 +181,9 @@ Developers should adopt a consistent naming convention for URIs that follows the
 
 
 HTTP GET requests to this collection URI would retrieve a list of book objects that are available in the database. Each book in that collection would have its own unique URI, that the client can use HTTP GET request on to return the details of that book.  
+
 ```text
-https://bpg-library.com/books 
+GET https://bpg-library.com/books 
 ```
 
 The returning body would like the example below.
@@ -368,7 +344,6 @@ On the Presentation Layers that allow for users to enter their own data for subm
 
  ```text
 POST https://bpg-library.com/books/4
-
 ```
 
 
@@ -391,7 +366,7 @@ public class Book
 }
 
 ```
-In my corresponding 
+**In my corresponding**
 
 # Configuring Access Control
 Broken or misconfigured access control on APIs were in the top 6 of both the OWASP Web API & the API Security Risks in 2021 and 2023 respectively. The root causes of these issues stemmed from:
@@ -413,7 +388,9 @@ Access Control checks can be broken and bypassed by modifying the URL, internal 
 
 Metadata can be manipulated, such as that JSON Web Tokens (JWT) can be tampered with by abusing their invalidation or a hidden field within the token modified.
 
-To prevent such attacks from occurring, developers should adopt the Least Privilege pattern, where a user’s default access level to any resource is set as “denied” until given permission explicit and that except for public resources, denying requests should be default. Privilege should not be granted based on purely a single condition, i.e. a Boolean flag attached to the request, and should instead be set by a combination of conditions based on resource type.
+To prevent such attacks from occurring, developers should adopt the Least Privilege pattern, where a user’s default access level to any resource is set as “denied” until given permission explicit and that except for public resources, denying requests should be default. 
+
+Privilege should not be granted based on purely a single condition, i.e. a Boolean flag attached to the request, and should instead be set by a combination of conditions based on resource type.
 
 If clients making DELETE requests, there must be some level of local authentication done on the endpoint to ensure that the clients level of access allows them to delete that resource. 
 
@@ -454,15 +431,18 @@ Public REST APIs that have no access control run the major risk of having its re
 A JWT is a data structure that contains a set of claims that are used for access control decisions. Cryptographic should be attached to the token so that its integrity is protected. Developers could use Message Authentication Code to protect the integrity of the token, however if it is used then it should be kept in mind that any service that validate the JWTs can also be used to create new ones with the same key, meaning that all services that use the same key must trust each other mutually. Consequently, if one service is comprised, the rest are.
 
 JWTs must contain the following standard claims to be verified, however this is no definitive list of what must be contained within the token.
-1.	The Issuer. Authorisation must be done on if the issuer is authorised.
-2.	The Audience.  Is the JWT relevant to the current service and target audience?
-3.	The Expiration Time. Is the time before the end of the validity period?
-4.	The Not Before Time.  Is the current time after the start of the validity period?
 
-https://www.chosenplaintext.ca/2015/03/31/jwt-algorithm-confusion.html https://www.youtube.com/watch?v=bW5pS4e_MX8
+1.	The Issuer - Authorisation must be done on if the issuer is authorised.
+2.	The Audience -  Is the JWT relevant to the current service and target audience?
+3.	The Expiration Time - Is the time before the end of the validity period?
+4.	The Not Before Time - Is the current time after the start of the validity period?
+
+
 
 **EXAMPLE**
  of JWT being attached and verified.
+
+
 
 ### Whats an API Key?
 Primarily used as an authentication to access an APIs service, API keys are used to ensure that the user making the request is verified within the system and that the API key is valid and verified within the system. 
@@ -475,8 +455,23 @@ API keys should only be used within private environments and should not be used 
 
 Timestamps could be added to the header of the request so that the server can compare the current timestamp to the request and can only accept requests if it is within a set timeframe, i.e. 30 seconds. 
 
+
+
+## Data Retention
+Data retention is a critical aspect of any services reliability, and not having safety measures in place that ensure clients cannot mistakenly or incorrectly delete data should be avoided at all cost. Without having data retention in the REST API, it increases the chances that clients who make mistakes cannot go back on them.
+
+APIs should adopt a data retention policy, and a suitable "undelete" function which can revert a previous delete request. There are some guidelines that a developer should follow for creating these policies: 
+
+- Personal data should be stored in-line with country-specific laws. In the UK, GDPR requires personal data to be deleted as soon as it is no longer needed. 
+- For metadata or important information on users, a policy of 30-days minimum for data retention.
+- For whole database tables, large resources or BLOBS, developers should adopt a 7-day minimum retention period.
+
+During the data retention window, users must be able to undelete their data without any data loss. 
+
 # Decoupling Admin and Client Services
-Broken Access Control can be abused by allowing users without authentication or authorisation to pose as users or admins without permission by extraneous methods. Splitting up the admin and user access with different URLS means that an attacker cannot just force browse to target URLS. Management and admin endpoints should not, under any circumstance, be exposed to the internet or in root calls of discoverability (i.e., HATEOS).
+Broken Access Control can be abused by allowing users without authentication or authorisation to pose as users or admins without permission by extraneous methods. 
+
+Splitting up the admin and user access with different URLS means that an attacker cannot just force browse to target URLS. Management and admin endpoints should not, under any circumstance, be exposed to the internet or in root calls of discoverability (i.e., HATEOS).
 
 
 **EXAMPLE**
@@ -487,7 +482,7 @@ Broken Access Control can be abused by allowing users without authentication or 
 
 
 
-## Cross-Site Request Forgery
+# Cross-Site Request Forgery
 
 Requests can be forged by malicious actors who have gained access to an authenticated user’s web browser. This type of access could be gained by tricking the user through a malicious website, email, or program so that unwanted actions can be performed on their system. 
 
@@ -526,36 +521,8 @@ POST and PATCH would be considered not idempotent, for both these requests could
 **EXAMPLE**
  of Patch
 
+RESTful APIs that utilise HTTP should ensure that idempotent methods cause no side effects within the system, otherwise it is not REST-adherant.
 
-
-RESTful APIs that utilise HTTP should ensure that idempotent methods cause no side effects within the system. 
-
-## Partial Requests and Responses
-Clients may want to request a certain subset of the data for a given collection resource, for example they may want only the Book Name and Author from a collection resource. The API should allow clients to request full representations, i.e returning the whole collection, and sending partial responses too.  
-A Partial Response would be distinguished by having the URI contain the fields that the response should return from the collection.  
-Here would be a simple request, that is requesting for the whole collection of books:
-<example> 
-https://bpglibrary-official.com/books/v1
-</example>
-This, in return, would return a response body with the full resource, alongside any others that may be attached due to the nature of the API.
-<example>
-**EXAMPLE**
- OF RESPONSE BODY
-</example>
-
-Requesting for a partial response would still target the same resource, however it would use field parameters so the API can reduce the data returned.
-
-<example> 
-https://bpglibrary-official.com/books/v1?fields=
-</example>
-
-The partial response would look as such:
-
-**EXAMPLE**
- OF PARTIAL RESPONSE
-
-Fields that do not match either the data type, or formatting scenario-specific, should have their requests rejected for security. 
-Patch Partial update
 
 ## Long Running Operation Response
 
@@ -590,7 +557,7 @@ An API is more than just the resources it exposes and the operations it can exec
 
 These are all the things that make up the API itself, and it is crucial for us, as developers, to address the potential issues that can come with excessive resource consumption and the over-exposure of endpoints. We want to ensure that our endpoints are meaningful and provide full context, whilst also limiting potential bad clients interactions with the client through safety checks and authentication.
 
-### Chatty APIs? 
+### What Chatty APIs? 
 
 Chatty APIs are APIs which expose a large number of small resources, requiring the client to make multiple requests to get all the data they need. We want to avoid situations these situations, ensuring that the system is not slowed down by numerous I/O operations.
 
@@ -671,20 +638,21 @@ The [Google API Design Guide](https://cloud.google.com/apis?hl=en) defines Custo
 
 7.	If the HTTP verb used for the custom method does not accept an HTTP request body, i.e. a GET or DELETE, the HTTP configuration must not use a request body at all, and all other request messages shall map to the URL query parameters.
 
-**EXAMPLE**
- of use cases and examples of the above being used.
 
- 
-```text
+For example, below is an URI to a custom method that would set the Book with an ID of 3 as "Rented"
 
-POST https://bpg-library.com
+```text 
+https://bpg-library.com/v1/books/3:rent
 ```
 
+Or, if we wanted to remove the Order with the ID of 3, we can call the below URI to use the "remove" custom method.
 
-
-
+```text 
+https://bpg-library.com/v1/order/3:remove
+```
 
 Before using a custom method to achieve functionality, developers should ensure that using a custom method is needed instead of standard methods. For example, if the client wants to query a resource with different parameters, a standard GET would do fine, or to change a resources property a PUT would suffice. Only when it is necessary should a custom method be use.
+
 
 ## Exception Handling and Error Logging
 Correctly implementing exception handling and error logging means that detecting, identifying, and responding to breaches becomes far easier. In addition to this, a solid error-catching system will return meaningful messages to clients which have incorrectly formatted their request, including the correct HTTP status code and a message that can guide the client to fixing their problem. 
@@ -730,11 +698,10 @@ A solid RESTful API will implement a technique called Pagination. It is a techni
 
 The REST API should support query strings that allows clients to filter and refine requests so that the fetched data can be delivered in a more manageable manner. There are parameters that the user can add to their request that indicates to the API that they want to paginate the results.
 
+Lets take this URI for example.
 ```text
 GET https://bpg-library.com/orders
 ```
-
-Lets take this URI for example.
 
 This URI could conceivably return a large amount of data, and we are essentially forcing the client to deal with this and then comb over the data once its returned. Instead, the URI could be altered to such:
 
@@ -784,7 +751,9 @@ A paginated response would look like this:
 ```
 
 ### Sorting and Limiting Fields
-What if the client wants specific resources that match certain parameters? Or perhaps return only specific values from a dataset?
+
+Clients may want specific resources that match certain fields, or may wish to return a specific value from a dataset.
+
 The API should support client filtering by taking a relevant field name as a sort parameter.
 
 For example, a client could send a URI like the one below to sort the returned books by their Book ID.
@@ -793,6 +762,16 @@ For example, a client could send a URI like the one below to sort the returned b
 GET https://bpg-library.com/books?sort=BookId
 ```
 
+The URI should follow a format similar to below:
+
+```
+https://.../*collection*/*id*:*action*?*parameters*
+```
+
+For example:
+```
+GET https://bpg-library.com/books?sort=BookId
+```
 Returning only specific values is an extension of how sorting would be implemented, and we can alter it slightly by making it accept a comma-separated list preceded by a command to indicate what values are wanted.
 
 For example, let’s say the bookkeepers want to find all books created by George R.R Martin within our /books collection, but only want the ID and title returned.
@@ -802,16 +781,6 @@ GET https://bpg-library.com/books?fields=BookID,Title
 ```
 
 
-## Data Retention
-Data retention is a critical aspect of any services reliability, and not having safety measures in place that ensure clients cannot mistakenly or incorrectly delete data should be avoided at all cost. Without having data retention in the REST API, it increases the chances that clients who make mistakes cannot go back on them.
-
-APIs should adopt a data retention policy, and a suitable "undelete" function which can revert a previous delete request. There are some guidelines that a developer should follow for creating these policies: 
-
-- Personal data should be stored in-line with country-specific laws. In the UK, GDPR requires personal data to be deleted as soon as it is no longer needed. 
-- For metadata or important information on users, a policy of 30-days minimum for data retention.
-- For whole database tables, large resources or BLOBS, developers should adopt a 7-day minimum retention period.
-
-During the data retention window, users must be able to undelete their data without any data loss. 
 
 To find more information on this topic, especially the legality side, visit [this link](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/data-protection-principles/a-guide-to-the-data-protection-principles/the-principles/storage-limitation/#:~:text=The%20UK%20GDPR%20does%20not%20dictate%20how%20long%20you%20should,how%20long%20you%20need%20it).
 
@@ -825,37 +794,30 @@ By including caching in the API, it optimises the network usage and improves the
 
 High performant RESTful APIs must contain caching capabilities. Developers should take the following points into account when implementing caching and improving optimisation.
 
-GETS must be cacheable by default, unless the client specifies otherwise, or a certain condition has been met. 
+-GETS must be cacheable by default, unless the client specifies otherwise, or a certain condition has been met. 
 
-Sensitive data, such as user profile details, passwords, admin details, should NOT be cacheable. 
+- Sensitive Data, such as user profile details, passwords, admin details, should **NOT** be cacheable. 
 
 
 ### Supporting Client-Side Caching
 Client-side caching is done through the request headers by the client attaching various headers to the request. They are essential to the process, and they provide the necessary information for clients and other components about whether a resource is cacheable. These headers are called Cache-Control.
 
-The most common Cache-Control headers are:
+The common Cache-Control headers that should be supported  are:
 
-Max-age – The maximum time in seconds for how long the cache will exist.
+| Header           | Description                                                             |
+|------------------|-------------------------------------------------------------------------|
+| Max-age          | The maximum time in seconds for how long the cache will exist.          |
+| Private          | Indicates that the response is only cacheable on the client’s browser.  |
+| Public           | Indicates that the response is publicly cacheable.                      |
+| No-Cache         | Indicates that the response can be cached, but it will be revalidated by the API before used. |
+| No-Store         | Response cannot be cached by the client.                                |
+| Must-Revalidate | Indicates the cached response must be revalidated before being used.   |
 
-Private – Indicates that the response is only cacheable on the client’s browser. 
-
-Public – Indicates that the response is publicly cacheable.
-
-No-Cache – Indicates that the response can be cached, but it will be revalidated by the API before used.
-
-No-Store – Response cannot be cached by the client.
-
-Must-Revalidate – Indicates the cached response must be revalidated before being used. 
 
 Cached responses may become “stale” once they can no longer be used as their current state. It requires a request to the server to either retrieve the data again, or to validate the caches contents.Below is an example of a request, and the response that specifies Control-Control headers.
 
 
-
-```
-GET https://bpg-library.com/books/44
-```
-
-
+**THIS WOULD BE A REQ**
 ``` JSON
 	200 OK
     Cache-Control: max-age=1000, private
@@ -877,14 +839,19 @@ GET https://bpg-library.com/books/44
 ```
 
 
-### E-Tags
+### ETags
 In addition to Cache-Control headers, a response may also contain an ETag, or an Entity Tag. Think of it as the digital fingerprint of the resource. 
 
 The ETag header is an indicator for the version of a given resource. Each time a resource is modified or changed, the ETag value must change as well. When a response contains an ETag and is cached by the client, the ETag should also be stored. 
 
+**IfMatch header**
+
+
 Clients would use the If-None-Match header to include the ETag into a request, to which the server will then attempt to match with the ETag stored on the server. If both values match, a 304 Not Modified status code can be returned without a body to indicate to the client that the cached version is not stale and can still be used.
 
 **Example** of an E-tag 
+
+
 If the values DON’T match, so the ETag sent by client isn’t matching with the server’s resource, the cached version should be disregarded and the new version cached instead. 
 
 ETags can be strongly or weakly validated. Weakly validated ETags are prefixed with a W/, which are easy to generate but are not very useful for comparing resource states.
@@ -894,7 +861,7 @@ Strong validators are ideal for comparing the resource states, but difficult to 
 
 In context, a strong validation means that the two resources with the same ETag are identical, byte-for-byte. Strongly validated ETags allow for caching of partial responses.
 
-Two resources with the same weakly validated ETag means that the representations are semantically the same, but not byte-for-byte, meaning it should not be allowed for caching. 
+Two resources with the same weakly validated ETag means that the representations are semantically the same, but not byte-for-byte, meaning it should not be allowed for caching. **What does this even mean??**
 
 Can use an MD5 Hash generator < hyperlink https://www.md5hashgenerator.com/>
 Developers would be expected to have a service or library that can create the ETag. 
@@ -905,9 +872,11 @@ There should no spaces, double quotes where not specified or backslashes within 
 # Versioning
 Versioning comes as the API evolves over time and how it may be required to make changes that could potentially break existing client usage. With versioning, we can introduce these changes whilst maintaining compatibility with the older versions. 
 
-The addition of versioning must keep in mind that client applications may not be aware of the updated functionality and must ensure that client workloads are still available regardless of versioning.
+The addition of versioning must keep in mind that client applications may not be aware of the updated functionality and must ensure that client workloads are still available regardless of versioning. This means that clients using the older version must not have existing work break.
 
 A version indicator could be a number, a project name, or anything that can be both meaningful and easy to differentiate between the various versions.
+
+If the client has not entered an incorrect header or has an incorrect API version, a status code of 400 and an apt message should be returned to the client.
 
 Although not related to REST, there are multiple approaches developers can follow that help clients navigate versioned APIs. 
 
@@ -933,12 +902,9 @@ Due to this, this method may not be the best fit. The following approaches may b
 The URI for each resource exposed will include a version indicator of the API. For example, if we wanted to make a request to the 2.0 version of the book API, a request would look like this:
 
 
-
 ```text
 https://bpglibrary-official.com/v2/books 
 ```
-
-
 
 **EXAMPLE**
  of the URI having the versioning. Response.
@@ -959,7 +925,7 @@ As you can probably see, this can get quite cumbersome and complicated as the AP
 ## Versioning through a Custom Request Header
 An easier, more consistent method of versioning the API is to include the API version indicator in the request headers. This method avoids the complexity of including the version for resources across the versions.
 
-Lets say we have a versioned API and that our Orders
+Lets say we have a versioned API and that our Orders...
 
 ```text
  GET   https://bpglibrary-official.com/v1/orders/3
@@ -1062,7 +1028,4 @@ To find out more on the specification, visit [spec.openapis.org/oas/latest.html]
 
 
 
-
-# Licensing
-Free to use and what license this falls under as it is an amalgamation of others work + other creative commons licensed work.
 
