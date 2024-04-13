@@ -109,8 +109,6 @@ Rate Limiting - Headers, Services implemented? Retuurning 429- Too many requests
 ## Common API Implementation Practices
 Requests can sometimes take longer than expected to process, in which case the client should have a 202-Accepted Status code returned to show that the request has been accepted, as well as a URI that can be used to show the progress. This is referred to as an Long Running Operation(LRO)
 
-Supporting Partial responses -- Is t
-
 
 Do not let your API be chatty. When designing your API, keep in mind the 
 workflow? Client journey? REsource Consumption
