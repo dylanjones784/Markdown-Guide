@@ -39,7 +39,7 @@ Which would return a suitable content type back to the user representing the dat
 
 - Responses should be labeled for caching or not appropriately. If the response is cacheable, the client should then be able to reuse that response data later for a specific length of time.
 
-- RESTful APIs should each component organized into layers to encourage modularity and a separation of concerns between each aspect of the API.
+- RESTful APIs should have each component organized into layers to encourage modularity and a separation of concerns between each aspect of the API.
 
 
 - Clients should be able to navigate throughout the API without prior knowledge of the applications endpoints, and that with a single URI the application should dynamically attach relevant resources via hyperlinks. This is called *Hypermedia as the Engine of Application State(HATEOAS).*
