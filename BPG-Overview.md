@@ -1,74 +1,263 @@
-# Introduction
-This is a best practice guide that is foundationally rooted in addressing the most common security concerns identified with Web APIs by OWASP, and layered with other standards that are from the likes of Microsoft, Google, IBM and more.
+# Overview Summary
 
-I believe that a collaborative, community-driven document is needed by the industry so that we are the driving force behind the common practices and standards. 
-
-Following the following sections can, and will, help ensure that client experience is solid, by being:
-
-- Seamless and Simple
-- Efficient
-- Consistent patterns across the API; Error Messages, Status 
-is as seamless and simple as possible:
+The following sections cover the key takeaways from each of the sections from the main document of this repository, the [Best Practice Guide](BestPractiseGuide.md). 
 
 
+This is to be a brief overlook of each section. For more details and information please visit the main guide.
 
 
-Simple, Consistent, Easy To Use, Adaptable , Efficient, Effective, Self-explanatory. This isn’t a do or don’t, this is amalgamation of standards that as a developer, you should follow, to promote those keywords.
+## Defining Principles 
+ 
+The following sections will cover REST and HTTP and how best to conform to the standards set by them.
 
 
-We will be using keywords that should be interpreted as described in BCP 14, RFC2119, RFC8174. These are "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL”.
+### Representational State Transfer (REST) 
+Representational State Transfer, or REST, is the architectural style that encourages growth, scalability, security, cacheability and self-descriptive services.
+
+A RESTful API is one that has its services defined by "resources", which are representations of data or a service that can be accessed by a client. All interactions between the client and the API are to be *stateless*, which is that all requests must contain all the information necessary to process that request. There are a number of constraints one must adhere to when creating REST APIs:
+1. Resources representations are sent to clients through HTTP defined methods, such as GET, PUT, POST, PATCH & DELETE.
+2. Server - Client communications can be done through various content types that can be agreed upon between both parties.
+3. Each request must be stateless, requiring no previous information and containing all information required to process it.
+4. Caching should be supported, and responses should indicate if they are or not.
+5. API Components should be split up into layers. This supports modularitty and separating the concerns of the system into individual components.
+6. Clients should be able to naturally discover the functionality of resources dynamically.
 
 
-## Overview Summary
+We establish paths for clients to access resources or perform actions on them, with each resource having a Uniform Resource Identifier (URI). For instance:
 
-The following sections cover the key takeaways from each of the identified themes of best practices and standards for REST APIs. This list follows;
+```text
+GET https://bpg-library.com/books/24 
+```
 
+Indicates a GET request (return a representation of the resource) to "bpg-library" domain to access the Book with the ID of 24. There are some common principles for URIs that should be followed:
 
-
-- Background information on REST and HTTP, how it should be used.
-
-
-- Resource and Design patterns and standards
-
-
-
-## Defining Principles: REST and HTTP
-REST and HTTP are the defining factors of the internet and ,
-
- the following sections break down how the services should best use these technologies.  
+- A collection resource is a list of resources that are stored, i.e., “.../books” and should be named after the plural version of the noun.
+- A simple resource would be a singular resource, i.e., book.
+- An HTTP GET request, for example, would be the verb.
+- That they follow clear paths, i.e there is no confusion between resources.
 
 
+API Discoverability is an important aspect of any RESTful API service. With the use of Hypermedia links, clients can be made aware of similar functionalities and resources between a given resource. This is referred to as the *Hypermedia as the Engine of Application State(HATEOAS).*.
 
-### Representational State Transfer (REST) and the HTTP Specification
-REST is a network architecture and we use HTTP enable communicatons between our 
-
---JSON 
---URI Patterns, values
---Hypermedia 
---Custom Methods
-Stateless requests.
-
-- URI patterns.
-- HTTP, request and responses
-- Query Paramters (Sorting and Limiting Fields) and Headers
+For example, a call to the URI below could return a JSON body that describes the base functionality for each exposed endpoint.
 
 
+```text
+GET https://bpg-library.com/books/
+```
 
-For the official HTTP Specification, visit [RFC7231](https://datatracker.ietf.org/doc/html/rfc7231) for more information. This section discusses what constraints, patterns and standards should be employed.
+The returned data contains the collection of books *plus* hypermedia links that shows related functionality alongside the relevant URI to access it.
+
+```json
+{
+    ...
+  "_links": {
+    "self": { "href": "bpg-library.com/" },
+    "books": { 
+        "href": "bpg-library.com/books",
+        "action": "GET",
+        "rel": "books",
+        "types":["text/xml","application/json"]
+    },
+    "authors": { 
+        "href": "bpg-library.com/members",
+        "action": "GET",
+        "rel": "members",
+        "types":["text/xml","application/json"]
+    },
+    "search": { 
+        "href": "bpg-library.com/books",
+        "action": "POST",
+        "title": "Add a book",
+       
+    }
+    ....
+  }
+}
+```
+
+### HTTP Specification
+HTTP is an established set of standards that facilitates communication between computer systems. It is one of the core building blocks of the Internet. The official stanadrds for HTTP is the [RFC7231](https://datatracker.ietf.org/doc/html/rfc7231).
+
+The main factors to be discussed in the following sections are: 
+- Uniform Resource Locators.
+- Requests and Responses.
+- HTTP Status Codes and Methods.
+- Security.
+- Headers.
+- Resource Design.
+
+#### Uniform Resource Locators 
+
+Making the endpoints accessible to clients is a key way of facilitating streamlined communication. Following a pattern of the following will keep resource collections and methods easily accessible for clients.
+
+```text
+https://<domain-name>/<resource-collection>/<resource-id>:<action>?<input parameters>
+```
+
+The HTTP method should dictate what is done on a request. Resource collections should be created by a POST request to ".../noun". For example:
+
+```text
+POST https://bpglibrary-official.com/books
+Authorization: Bearer...
+Content-Type: application/json
+{
+  "title": "Dylans New Book"...
+}
+```
+The above request will create a new resource under the Books collection.
+
+Conventing to keep in mind when establishing the URLS should be:
+- Easily understandable.
+- Readable.
+- Define the resources as nouns.
 
 
 
-Verbs and Nouns
-Idempotency
-HTTP Status codes
-Requests and Responses
 
-Query paramters and headers
-Content types,
-Data types
+#### Requests and Responses
+
+The core of it all is the communication between the client and server. Implementing the correct strategies to handle client requests and responses is key to providing a reliable and usable service. Failing to do this 
 
 
-Supporting Caching and optimisation with the 
+HTTP uses Status Codes to indicate the state of a request. It provides further insight on what wrong with the request and how to potentially fix the issue. There are 5 distinct classes of Status Codes:
+
+| Value | Indicator           | Meaning                                                           |
+|-------|---------------------|-------------------------------------------------------------------|
+| 1xxx  | Informational       | Request was received and is being processed.                      |
+| 2xxx  | Request Success     | Request was understood and executed successfully.                 |
+| 3xxx  | Request Redirection | Original method has been replaced or moved, further action needed.|
+| 4xxx  | Client Error        | The request was badly formatted or cannot be executed.            |
+| 5xxx  | Server Error        | Server failed to fulfill the valid request.                       |
+
+
+HTTP methods supported should return with the correct Status Code, and that they should cause as little side-effects within the system as possible. These types of requests are referred to as Idempotent Request, and allows for requests to be retried without any reactions in the system.
+
+Multiple GET requests to the same URI should result in the same object being retrieved, or a DELETE request to return either 204 for the first request, and 404 for subsequent requests.
+
+
+| Method | Description                                | Response Status Code                    | Idempotent |
+|--------|--------------------------------------------|-----------------------------------------|------------|
+| PATCH  | Create/Modify the resource with JSON       | 200-OK, 201-Created                | Yes    |
+| PUT    | Create/Replace the whole resource          | 200-OK, 201-Created                     | Yes        |
+| POST   | Create new resource                           | 201-Created with URL of created resource | No         |
+| POST   | Action                                     | 200-OK                                   | No         |
+| GET    | Read resource or collection                | 200-OK                                   | Yes        |
+| DELETE | Delete resource                       | 200-OK / 204-No Content; avoid 404-Not Found     | Yes        |
+
+
+Content Types are formats of communication set between the client and the API. This guide mainly discusses JavaScript Object Notation(JSON), but there are [other formats](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type) that can be used. 
+
+Requests that are received with a content type that is not supported by the API, or is invalid, it should be rejected from the system with 406-Not Acceptable or 415-Refusal to Accept Request. 
+
+A request which does not contain this information should be responded with a 401-Unauthorised, including a message on what the user requires to be authenticated to access the resource.
+
+To add an extra layer of security, API Keys or JWTs could be used to verify clients sending requests. Supporting these features can lead to a more secure system, at the sake of having clients remember to include the relevant authorisation in every request.
+
+
+Data deleted should be retained for an X perod time. Helps improve reliability of service if in the case where someone deletes by mistake / was not authorised.
+
+For requests that may take longer to process, The API should return a 202-Accepted to indicate the request has been received and initiate a separate operation to perform the work needed. A URI should be provided so the client can keep updated.
+
+
+The API should support paramterised queries, allowing for actions to be performed on resources, or to alter the expected response back. Semantically, it should follow a format as below: 
+
+```text
+https://<domain-name>/<resource-collection>/<resource-id>:<action>?<input-parameters>
+```
+
+This paramaters must be validated against, otherwise clients could gain unauthorised access to resources and operations. 
+
+
+APIS must enforce Rate Limiting. It is a simple way of ensuring clients cannot make too many requests at once, or within a certain period on a given resource. Without this, resources can be excessively accessed which will increase latency and the traffic between the API.  For example, the request below states that they wish to retrieve a maximum of 50 books.
+
+```text
+GET https://bpg-library.com/v1/books/
+...
+max_results: 50
+```
+
+If this this value is not validated against, the client could alter the request to look like:
+
+```text
+GET https://bpg-library.com/v1/orders/
+...
+max_results: 10000
+```
+This is just one method of how clients could excessively consume resources, and that developers should create strategies to counter them.
+
+Clients who have exceeded the amount of requests on a given resource should have a 429-Too Many Requests Status Code returned to them.
+
+
+
+
+#### Headers
+
+[HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers) enables further information to be added about a given request or response, such as:
+ - Client Authorisation.
+ - Version Indication.
+ - Caching.
+ - Payload Information. 
+
+Client-side caching can be done through Cache-Control headers that should be supported. The header provides the necessary information for clients to indicate if a resource is cacheable, how long it can be cached and the state of the cached version. 
+
+
+The common Cache-Control headers that should be supported  are:
+
+| Header           | Description                                                             |
+|------------------|-------------------------------------------------------------------------|
+| Max-age          | The maximum time in seconds for how long the cache will exist.          |
+| Private          | Indicates that the response is only cacheable on the client’s browser.  |
+| Public           | Indicates that the response is publicly cacheable.                      |
+| No-Cache         | Indicates that the response can be cached, but it will be revalidated by the API before used. |
+| No-Store         | Response cannot be cached by the client.                                |
+| Must-Revalidate | Indicates the cached response must be revalidated before being used.   |
+
+
+Custom headers are defined by "x-", but should be avoided as they are deprecated as of June 2012 and the standards became [RFC6648](https://datatracker.ietf.org/doc/html/rfc6648). Its important that developers support a large range of headers as specified in the HTTP specification, and to let clients know which are supported and not.
+
+---- 
+ETags are values that can be attached in the response as a digital fingerprint of the resource, and should be allowed to be stored client-side to be used in further requests. 
+
+Clients can use the If-None-Match or If-Match header to determine if the state matches what is stored within the API. 
+
+If-None-Match would tell the API to attempt to match with the ETag stored on the server. If both values match, a 304 Not Modified Status Code should be returned to indicate to the client that the cached version is not stale and can still be used.
+
+If-Match is used to specify what state of resource to access. This allows for clients to specify the exepcted state of a resource before an operation, and only returns data from GET or HEAD requests if the value sent can be matched. 
+
+
+### Resource Design
+Identifying the resources, endpoints and workflows a client will go through using your API can be key to identifying potential pitfalls, as well as visualising the hierarchy the API will comprise of. A resource hierarchy is formed by the services URLs that allow clients to use HTTP Methods like GET, POST, PUT etc. For example:
+
+For example, the URI:
+```text
+GET https://bpg-library.com/books
+```
+Will return the the book collection. 
+
+```text
+POST https://bpg-library.com/books/
+...
+{
+    "title": "Three Body Problem",
+    "author": "Cixin Liu",
+    "pubDate": "2008",
+    "availability": "Available",
+
+}
+    ...
+```
+This is an example request a client may send that will create a new Book resource. This helps create a hierarchy of resources that can have its routing (the URI) paramterized.
+
+A really solid example of identifying the workflows and resources before implementation is the [How to GET a Cup of Coffee](https://www.infoq.com/articles/webber-rest-workflow/) by Ian Robinson and Jim Webber. It discusses how a workflow begins by viewing it from a customers viewpoint on what they want to achieve, and build up from there. A workflow is a structured set of work that needs to be done to complete a given task. Think of it as splitting up the steps from A to Z, breaking down each step.
+
+For example, in the booking keeping system used in this guide, we can safely expect that clients will want to:
+- Create a new Book record
+- View Book records
+- Create Orders for Customers
+- Delete Old Orders
+
+The list could continue. Identifying these workflows *prior* to implementation streamlines the development process, increases understanding of client requirements and minimizes the risk of missing critical functionality.
 
 
 
@@ -100,10 +289,7 @@ Client data should be sanitised to protect against SQL Injections. Sanitisation 
 Deleted data should be retained for X amount of days before being erased completely. Clients should have the ability to rollback their changes so that data can be recovered promptly.
 
 
-
-Validating against Cross site request forger
-
-Rate Limiting - Headers, Services implemented? Retuurning 429- Too many requests
+**Validating against Cross site request forger Rate Limiting - Headers, Services implemented?**
 
 
 ## Common API Implementation Practices

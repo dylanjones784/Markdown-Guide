@@ -10,7 +10,11 @@ REST will be briefly discussed and how we can ensure our APIs adhere to those pr
 ## What’s REST?
 Representational State Transfer is a network architectural approach to the communication of hypermedia through computer systems across the web. It is the most common type of API used on the internet to date, for it is independent of any underlying protocols and not restricted to usage just through HTTP calls. 
 
-This guide focuses on the usage of HTTP as the applications protocols when designing REST APIs. This guide will not encompass the entirety of what REST is, however, the main design principles are as follows:
+We define resources as the nouns of REST, and that we define these resources within the API so that we can expose them to be manipulated with a small number of methods that are referred to as the verbs of REST. 
+
+- These resources are manipulated by having their representations sent to the client through well-defined operations. For HTTP, this would be through the standard methods of GET, PUT, POST, PATCH & DELETE.
+
+- The server will communicate with clients through various content types that are agreed upon by the client and the server. For example, if the above example was used in a GET request, a JSON response body may look like below:
 
 A RESTful API contains resources, which can be representations of data, objects or a service that is accessible by the user.
 
@@ -21,12 +25,7 @@ A RESTful API contains resources, which can be representations of data, objects 
 https://bpg-library.com/books/4
 ```
 
-
-- These resources are manipulated by having their representations sent to the client through well-defined operations. For HTTP, this would be through the standard methods of GET, PUT, POST, PATCH & DELETE.
-
-- The server will communicate with clients through various content types that are agreed upon by the client and the server. For example, if the above example was used in a GET request, a JSON response body may look like below:
-
-
+Which would return a suitable content type back to the user representing the data. In this instance, its JSON.
 ```json
 {
     "bookID": 3,
@@ -87,13 +86,17 @@ Level 3 would correlate to having a truly RESTful API that encompasses all of Fi
 
 
 # HTTP Specifciation
-REST is not HTTP, and the two should not be mixed up by being considered the same thing. REST is not reliant upon any protocol, but we make use of the HTTP application protocols as it is the most popular platform for REST API implementation.
+REST is not HTTP, and the two should not be mixed up by being considered the same thing. REST is not reliant upon any protocol, but we make use of the HTTP application protocols as it is the most popular platform for REST API implementation. The official specification  for HTTP is the [RFC7231](https://datatracker.ietf.org/doc/html/rfc7231)
 
-It also enables client applications to interact with your API seamlessly, for almost all languages can generate and parse HTTP requests and responses. 
+HTTP enables client applications to interact with your API seamlessly, and provide the protocols and standards for the: 
+- URIs (How the clients interact with resources)
+- Requests 
+- Response
 
+These shall be discussed further throughout the document.
 
 ## HTTP Status Codes
-HTTP Status codes are indicators on the state of a HTTP request that has been sent to the API. They tell the client whether or not their request has been accepted, failed, not authenticated and more. It is not required to understand and know all the accepted status codes, however they can be split up into 5 distinct classes:
+HTTP Status Codes are indicators on the state of a HTTP request that has been sent to the API. They tell the client whether or not their request has been accepted, failed, not authenticated and more. It is not required to understand and know all the accepted Status Codes, however they can be split up into 5 distinct classes:
 
 | Value | Indicator           | Meaning                                                           |
 |-------|---------------------|-------------------------------------------------------------------|
@@ -104,9 +107,9 @@ HTTP Status codes are indicators on the state of a HTTP request that has been se
 | 5xxx  | Server Error        | Server failed to fulfill the valid request.                       |
 
 
-It is recommended for developers to have a dedicated service or class in the server layer that is dedicated to returning generic return messages alongside the correct status code. 
+It is recommended for developers to have a dedicated service or class in the server layer that is dedicated to returning generic return messages alongside the correct Status Code. 
 
-Correct HTTP status codes must be used for all responses by the API to indicate the outcome of a given request. Below is a table of what developers should return for each of the HTTP operations
+Correct HTTP Status Codes must be used for all responses by the API to indicate the outcome of a given request. Below is a table of what developers should return for each of the HTTP operations
 
 
 
@@ -125,7 +128,7 @@ If a user is forbidden from access, i.e not authorised, a 403-Forbidden should b
 Some client requests may have mismatching data types to what is expected in the API, or perhaps set a Content-Length 
 
 
-For requested resources who have had their URL changed, the status code 301 - Moved Permanently / 302 - Found (Moved Temporarily) should be returned.
+For requested resources who have had their URL changed, the Status Code 301-Moved Permanently / 302- Found (Moved Temporarily) should be returned.
 
 
 
@@ -150,13 +153,17 @@ For more information on the full current best standard for Media Type Specificat
 Resource Oriented APIs are modelled as a “resource hierarchy” where each endpoint is a simple resource, or a collection of resources. Endpoints, what the client interacts with, mirrors distinct resource(s) and forms a cohesive hierarchy of resources. 
 
 For example, the URI:
+
 ```text
 GET https://bpg-library.com/books
 ```
-Will return the the book collection, and
+
+Will return the the book collection, and:
+
 ```text
 GET https://bpg-library.com/books/24
 ```
+
 Will return the book with an ID of 24. This helps create a hierarchy of resources that can have its routing (the URI) paramterized.
 
 Principles to focus on when designing a resource-oriented API are:
@@ -167,7 +174,7 @@ Principles to focus on when designing a resource-oriented API are:
 
 Developer's should initialize their design process by identifying the business entities and endpoints that will be exposed to the client prior to development. Having your design dependent on the resources you expect to expose allows for a simplistic interface that can adapt rapidly to evolving functionality.
 
-For example, in a bookkeeping system, the main entities that may be exposed could be Authors, Books and Orders.
+For example, in a bookkeeping system, the main entities that may be exposed could be Authors, Books and Orders. 
 
 To create a new Book, a HTTP POST request that contains the book information would be sent to our API. The following HTTP response would then indicate if the book was created, or if the process had failed.
 
@@ -180,14 +187,14 @@ It is important to note that a resource doesn’t have to be a single piece of d
 
 
 ## Resource Hierarchy
-Resource-oriented APIs are modelled as a resource hierarchy, where each node (resource endpoint) is either a simple resource or a collection resource. We define resources as the nouns of REST, and that we define these resources within the API so that we can expose them to be manipulated with a small number of methods that are referred to as the verbs of REST. 
-
+Resource-oriented APIs are modelled as a resource hierarchy, where each node (resource endpoint) is either a simple resource or a collection resource. 
 
 Developers should adopt a consistent naming convention for URIs that follows the noun / verb pattern.
 
 - A collection resource is a list of resources that are stored, i.e., “books” and should be named after the plural version of the noun.
 - A simple resource would be a singular resource, i.e., “member”.
 - An HTTP GET request would be the verb.
+- That they follow clear paths, i.e there is no confusion between resources.
 
 
 HTTP GET requests to this collection URI would retrieve a list of book objects that are available in the database. Each book in that collection would have its own unique URI, that the client can use HTTP GET request on to return the details of that book.  
@@ -367,7 +374,7 @@ POST https://bpg-library.com/books/4
 
 The "availability" field has, initially, a valid value, however with the use of the escape character " ' ", it can be manipulated to run malicious SQL code. In this example, it would delete the Books table.
 
-Data that is contained in the clients request should be mapped to an object that exists within the backend of the API. This allows for a safe and secure conversion of data for the server to deal with, in addition to sending back a bad request status code if a field does not match.
+Data that is contained in the clients request should be mapped to an object that exists within the backend of the API. This allows for a safe and secure conversion of data for the server to deal with, in addition to sending back a bad request Status Code if a field does not match.
 
 Avoid using hardcoded request.getParameters to place data into queries for insertion into a database. One way of doin this is to map data to an identical model of the object so that another layer of validation is ensured. 
 
@@ -492,7 +499,7 @@ Primarily used as an authentication to access an APIs service, API keys are used
 
 -	API keys must be used in every request sent by the user.
 -	They must not be publicly accessible.
--	Violation of the user agreement or through unauthorized access of services would result in the API key to be revoked.
+-	Violation of the user agreement or through unauthorised access of services would result in the API key to be revoked.
 
 API keys should only be used within private environments and should not be used or trusted with third-party clients to access your API unless strictly necessary. 
 
@@ -555,7 +562,7 @@ These two examples are requests that are *idempotent*. Using these requests cons
 
 POST would be considered not idempotent, for it could cause partial side effects within the system beyond creating a resource. For example, an Order being created could cause some functionality to fire off, and that changes a value elsewhere.
 
-PATCH requests are not inherently idempotent, but do require some thought behind the design of such a request to ensure that there are no side-effects within the system.
+PATCH requests are idempotent, but do require some thought behind the design of such a request to ensure that there are no side-effects within the system.
 
 Take a PATCH request for example. The client wants to update the 4th Books Author field, and would use a request formatted similar to the one below:
 
@@ -573,7 +580,7 @@ RESTful APIs that utilise HTTP should ensure that idempotent methods cause no si
 
 ## Long Running Operations
 
-Sometimes a user’s request can take longer than expected to handle and process correctly, to which the API may return a response to the client that states that the operation is in process. The API should return a 202 Accepted Status code to indicate the request has been received and initiate a separate operation to perform the work needed. 
+Sometimes a user’s request can take longer than expected to handle and process correctly, to which the API may return a response to the client that states that the operation is in process. The API should return a 202 Accepted Status Code to indicate the request has been received and initiate a separate operation to perform the work needed. 
 
 The response must also provide a method of monitoring the progress of the request, this would be in the form of another endpoint or the resource itself.
 
@@ -585,7 +592,7 @@ Stateless Requests are when each request must contain all the information requir
 
 This means that each request will contain the all information necessary, and that the system shouldn’t have to search further than the requests body and header tags to authorise the action the client wants to perform.
 
-A request which does not contain this information should be responded with a 401-Unauthorized, including a message on what the user requires to be authenticated to access the resource.
+A request which does not contain this information should be responded with a 401-Unauthorised, including a message on what the user requires to be authenticated to access the resource.
 
 If the client is attempting to access a restricted resource or operation, the request must contain the required information to authenticate their access level. This could be done with a [JWT or an API key](#tokens-and-api-keys).
 
@@ -601,7 +608,7 @@ Content-Type: application/json
 }
 ```
 
-The request contains a valid URI & Content Type, an accepted HTTP method, relevant Authorisation and the body of data that is to be sent to the API.
+The request contains a valid URI & Content Type, an accepted HTTP method, relevant Authorisation, the correct version and the body of data that is to be sent to the API.
 
 This is what is meant by **stateless**, that each request is able to be processed without reliance on any prior.
 
@@ -681,7 +688,7 @@ To combat such avenues of exploitation on your services, there are methods and p
 
 -	Using HATEOAS to lower the amount of calls a client must make to discover the functionality for a given resource.
 
--	Having a finite number of times that requests can be sent within a timeframe before a 405-status code is sent.
+-	Having a finite number of times that requests can be sent within a timeframe before a 405-Method Not Allowed Status Code is sent.
 
 
 ## Custom Methods
@@ -723,7 +730,7 @@ Before using a custom method to achieve functionality, developers should ensure 
 
 
 ## Exception Handling and Error Logging
-Correctly implementing exception handling and error logging means that detecting, identifying, and responding to breaches becomes far easier. In addition to this, a solid error-catching system will return meaningful messages to clients which have incorrectly formatted their request, including the correct HTTP status code and a message that can guide the client to fixing their problem. 
+Correctly implementing exception handling and error logging means that detecting, identifying, and responding to breaches becomes far easier. In addition to this, a solid error-catching system will return meaningful messages to clients which have incorrectly formatted their request, including the correct HTTP Status Code and a message that can guide the client to fixing their problem. 
 
 The last thing a developer wants is to find out way after the fact that their service has been breached and have no way of fixing it due to lack of information on the issue.
 
@@ -733,7 +740,7 @@ An API which does not correctly handle exceptions or log their errors may contai
 
 - Logs stored locally, following no format.
 
-- Client confusion when a badly formatted request is sent and no meaningful message nor status code is returned.
+- Client confusion when a badly formatted request is sent and no meaningful message / Status Code is returned.
 
 
 Developers should follow these patterns when developing their API's exception and error handling:
@@ -917,7 +924,9 @@ In addition to Cache-Control headers, a response may also contain an ETag, or an
 The ETag header is an indicator for the version of a given resource. Each time a resource is modified or changed, the ETag value must change as well. When a response contains an ETag and is cached by the client, the ETag should also be stored. 
 
 
-Clients would use the [If-None-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match) header to include the ETag into a request, to which the server will then attempt to match with the ETag stored on the server. If both values match, a 304 Not Modified status code can be returned without a body to indicate to the client that the cached version is not stale and can still be used.
+Clients would use the [If-None-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match) header to include the ETag into a request, to which the server will then attempt to match with the ETag stored on the server. If both values match, a 304-Not Modified Status Code can be returned without a body to indicate to the client that the cached version is not stale and can still be used. Otherwise, the server should respond with the new state of the resource to update the cached version.
+
+
 
 ETags can be strongly or weakly validated. Weakly validated ETags are prefixed with a W/, which are easy to generate but are not very useful for comparing resource states. In context, a strong validation means that the two resources with the same ETag are identical, byte-for-byte. Strongly validated ETags allow for caching of partial responses.
 
@@ -930,8 +939,6 @@ ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4"
 ETag: W/"0815"
 ```
 
-
-If the values DON’T match, i.e the ETag sent by client does not match with the server’s resource, the cached version should be disregarded and the new version cached instead. 
 
 [If-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Match) is another header to be used with ETags which compares the ETag attached to the request to what is stored with the resource. It allows for clients to specify what state of the resource they wish to access.
 
@@ -946,7 +953,7 @@ The addition of versioning must keep in mind that client applications may not be
 
 A version indicator could be a number, a project name, or anything that can be both meaningful and easy to differentiate between the various versions.
 
-If the client has not entered an incorrect header or has an incorrect API version, a status code of 400 and an apt message should be returned to the client.
+If the client has not entered an incorrect header or has an incorrect API version, a Status Code of 400 and an apt message should be returned to the client.
 
 Although not related to REST, there are multiple approaches developers can follow that help clients navigate versioned APIs. 
 
@@ -1062,7 +1069,7 @@ Again, the object schema must match what is in the version being set **UNLESS** 
 
 All clients are required to include that custom header with their targeted API version. If it is omitted, or left out, a *Default* Version can be used, which is essentially just 
 
-If the API version is not included, a status code of 400 and an relevant message describing the issue must be returned to the client. 
+If the API version is not included, a Status Code of 400-Bad Request and an relevant message describing the issue must be returned to the client. 
 
 ## Deprecating Functionality
 It has been stated before that as API functionality evolves and grows, changes may be made to functionality that break existing client applications. Developers should avoid disrupting client interactions, however sometimes this is not possible. 
@@ -1085,7 +1092,7 @@ If the functionality is still available, but is going to be deprecated in a week
 ```
 (url) is optional and can be used to show more information on the matter for the client.
 
-If the functionality has fully deprecated and is no longer used by the API, the API must return a response that contains a 410-Gone status code.
+If the functionality has fully deprecated and is no longer used by the API, the API must return a response that contains a 410-Gone Status Code.
 
 
 Additionally, developers should be removing unused dependencies and libraries that are deprecated or no longer supported. Reviews of used libraries and dependencies should be conducted regularly.
