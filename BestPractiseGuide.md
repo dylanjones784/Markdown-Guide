@@ -1,16 +1,14 @@
 # API Design Theories and Background Information
 
-This guide is not to enforce a rigious framework that cages developers in with the Do's and Don'ts of creating REST  APIS. The aim of my guide is to bring together all the various design and implementation strategies used across the industry into one, singular reference. 
-
-
+The aim of this guide is to bring together all the various design and implementation strategies used across the industry into one, singular reference. It brings common issues and solutions, practices and standards employed by the likes of Google, Microsoft etc and provides a one-stop-shop for potential REST API Developers. 
 
 REST will be briefly discussed and how we can ensure our APIs adhere to those principles set by Roy Fielding, as well as the how we will utilise the HTTP Specification.
 
 
 ## What’s REST?
-Representational State Transfer is a network architectural approach to the communication of hypermedia through computer systems across the web. It is the most common type of API used on the internet to date, for it is independent of any underlying protocols and not restricted to usage just through HTTP calls. 
+Representational State Transfer is a network architectural approach to the communication of hypermedia through computer systems across the web. It is the most common type of API used on the internet to date, and it is independent of any underlying protocols and not restricted to usage just through HTTP calls. 
 
-We define resources as the nouns of REST, and that we define these resources within the API so that we can expose them to be manipulated with a small number of methods that are referred to as the verbs of REST. 
+We define resources as the nouns, and we can expose them to be manipulated with a small number of methods that are referred to as the verbs of REST. 
 
 - These resources are manipulated by having their representations sent to the client through well-defined operations. For HTTP, this would be through the standard methods of GET, PUT, POST, PATCH & DELETE.
 
@@ -41,7 +39,7 @@ Which would return a suitable content type back to the user representing the dat
 
 - Responses should be labeled for caching or not appropriately. If the response is cacheable, the client should then be able to reuse that response data later for a specific length of time.
 
-- RESTful APIs should each component organized into layers, for example the client would interact with the Presentation Layer (The UI), and that would interact with the Application Layer. 
+- RESTful APIs should each component organized into layers to encourage modularity and a separation of concerns between each aspect of the API.
 
 
 - Clients should be able to navigate throughout the API without prior knowledge of the applications endpoints, and that with a single URI the application should dynamically attach relevant resources via hyperlinks. This is called *Hypermedia as the Engine of Application State(HATEOAS).*
@@ -73,6 +71,7 @@ Which would return a suitable content type back to the user representing the dat
   }
 }
 ```
+Each link contains self-descriptive messages on what can be done, how, and where the client needs to go for it.
 
 We can measure an API's adherence to the REST Principles by using the [Richardson Maturity Model for Web APIs](https://martinfowler.com/articles/richardsonMaturityModel.html). Created in 2008 and designed to break down the main elements of the REST approach into three simple steps.
 
@@ -86,12 +85,14 @@ Level 3 would correlate to having a truly RESTful API that encompasses all of Fi
 
 
 # HTTP Specifciation
-REST is not HTTP, and the two should not be mixed up by being considered the same thing. REST is not reliant upon any protocol, but we make use of the HTTP application protocols as it is the most popular platform for REST API implementation. The official specification  for HTTP is the [RFC7231](https://datatracker.ietf.org/doc/html/rfc7231)
+HTTP is an established set of standards that facilitates communication between computer systems. It is one of the core building blocks of the Internet. The official stanadrds for HTTP is the [RFC7231](https://datatracker.ietf.org/doc/html/rfc7231).
+
+REST is not reliant upon any protocol, but we make use of the HTTP application protocols as it is the most popular platform for REST API implementation. 
 
 HTTP enables client applications to interact with your API seamlessly, and provide the protocols and standards for the: 
-- URIs (How the clients interact with resources)
-- Requests 
-- Response
+- URIs (How the clients interact with resources).
+- Requests.
+- Responses.
 
 These shall be discussed further throughout the document.
 
@@ -109,7 +110,7 @@ HTTP Status Codes are indicators on the state of a HTTP request that has been se
 
 It is recommended for developers to have a dedicated service or class in the server layer that is dedicated to returning generic return messages alongside the correct Status Code. 
 
-Correct HTTP Status Codes must be used for all responses by the API to indicate the outcome of a given request. Below is a table of what developers should return for each of the HTTP operations
+Correct HTTP Status Codes must be used for all responses by the API to indicate the outcome of a given request. Below is a table of what developers should return for each of the HTTP operations:
 
 
 
@@ -125,12 +126,8 @@ Correct HTTP Status Codes must be used for all responses by the API to indicate 
 
 If a user is forbidden from access, i.e not authorised, a 403-Forbidden should be returend.
 
-Some client requests may have mismatching data types to what is expected in the API, or perhaps set a Content-Length 
-
 
 For requested resources who have had their URL changed, the Status Code 301-Moved Permanently / 302- Found (Moved Temporarily) should be returned.
-
-
 
 To find more on Status Codes, visit [RFC 7231](https://datatracker.ietf.org/doc/html/rfc7231#section-6).
 
@@ -143,13 +140,13 @@ RESTful APIs should include a list of accepted media types, that can be requeste
 
 Requests that are received with a content type that is not supported by the API, or is invalid, it should be rejected from the system with 406 (“Not Acceptable”) or 415 (“Refusal to accept request”).
 
-Some of the more popular formats of content types that should be supported are “text/plain“, “application/xml“, “text/html“, “application/json“, “image/gif“, and “image/jpeg“.
+Some of the more popular formats of content types that should be supported are “text/plain“, “application/xml“, “text/html“, “application/json“, “image/gif“, and “image/jpeg“. All of these are indicators of data that can be communicated with.
 
 
 For more information on the full current best standard for Media Type Specifications, visit [RFC 6838](https://www.rfc-editor.org/rfc/rfc6838).
 
 
-# Establishing the Exposed Resources (Was Resource-Oriented Design)
+# Resource-Oriented Design
 Resource Oriented APIs are modelled as a “resource hierarchy” where each endpoint is a simple resource, or a collection of resources. Endpoints, what the client interacts with, mirrors distinct resource(s) and forms a cohesive hierarchy of resources. 
 
 For example, the URI:
@@ -168,7 +165,7 @@ Will return the book with an ID of 24. This helps create a hierarchy of resource
 
 Principles to focus on when designing a resource-oriented API are:
 1. The expected resources the API can provide.
-2. The relationships and hierarchy between resources. 
+2. The relationships between resources. 
 3. The schema of each resource (i.e, the fields each resource represents)
 4. The HTTP operations that can be executed on each resource.  
 
@@ -180,8 +177,8 @@ To create a new Book, a HTTP POST request that contains the book information wou
 
 | Example                                                   | Description |
 | --------------------------------------------------------- | ----------- |
-| [https://bpglibrary-official.com/books](https://bpglibrary-official.com/books)         | Good        |
-| [https://bpglibrary-official.com/create-book](https://bpglibrary-official.com/create-book) | Avoid    |
+| [https://bpg-library.com/books](https://bpg-library.com/books)         | Good        |
+| [https://bpg-library.com/create-book](https://bpg-library.com/create-book) | Avoid    |
 
 It is important to note that a resource doesn’t have to be a single piece of data, for example the book resource might be comprised of multiple tables from a database, but the client would only see the returned object as a single entity. Developers should not, when designing their API, mimic their database relationships for it is the purpose of REST to model the entities and operations that the application can perform on those entities. The inner workings of the system should not be exposed to clients.
 
@@ -255,9 +252,7 @@ Building your API around these associations will quickly lead to confusion and b
 
 
 ## Resource Discovery 
-Resource discoverability is at the heart of our design principles for creating REST APIs. 
-
-HATEOAS, or Hypermedia as the Engine of Application State, is an architectural constraint of REST and is unique from other network architectures. We can use HATEOAS to enable resource and service discoverability for our clients without them requiring prior knowledge on the API.
+Resource discoverability is at the heart of our design principles for creating REST APIs. This is primarily done with HATEOAS, or Hypermedia as the Engine of Application State. It is an architectural constraint of REST and is unique from other network architectures. We can use HATEOAS to enable resource and service discoverability for our clients without them requiring prior knowledge on the API.
 
 The term “hypermedia” refers to content that contains any link to any other forms of media, mainly text, images, or movies. 
 
@@ -304,7 +299,7 @@ For example, if a client makes a request to retrieve the books with the ID of 24
 
 Hypermedia links are required to be in an array of “links” in the response body. This can be indicated by "links" or "_links".
 
-We use the [RFC8288](https://www.rfc-editor.org/rfc/rfc8288) standard as a framework for building links that define the relationships of a given resource. It states that hypermedia links must contain the following properties:
+Devlopers should use the [RFC8288](https://www.rfc-editor.org/rfc/rfc8288) standard as a framework for building links that define the relationships of a given resource. It states that hypermedia links must contain the following properties:
 
 1. Target URI – Represented by the href attribute.
 2. Link Relation – The relation between the source and the target resource.
@@ -346,7 +341,7 @@ There are some drawbacks to this, mainly being the increased application complex
 It is important to note that some layers may perform multi-uses, such as one layer handling both the business logic and data access of the API, or that requests are validated within the presentation layer prior to be sent to the server. Developers should keep these layers as simplistic as possible, allowing the API to remain simplistic in design and easily adaptable to future functionality being added.
 
 
-The following sections will cover the best practices and design patterns one should follow when configuring and creating the access control for the API. It is a coagulation of security practices from Microsoft, Google, REST API professionals and The Open Worldwide Application Security Project Top 10 Web Application Security Risks & the API Security Top 10. To delve deeper into the OWASP Top 10, which features an extensive list of potential security risks and ways to mitigate the effects, visit the [OWASP API Security Project](https://owasp.org/www-project-top-ten/) website.
+The following sections will cover the best practices design patterns one should follow when creating, configuring and validating the access control for an API. It is a collation of security practices from Microsoft, Google  and The Open Worldwide Application Security Project Top 10 Web Application Security Risks & the API Security Top 10. To delve deeper into the OWASP Top 10, which features an extensive list of potential security risks and ways to mitigate the effects, visit the [OWASP API Security Project](https://owasp.org/www-project-top-ten/) website.
 
 
 ## Securing and Verifying Communication Channels
@@ -372,7 +367,7 @@ POST https://bpg-library.com/books/4
 }
 ```
 
-The "availability" field has, initially, a valid value, however with the use of the escape character " ' ", it can be manipulated to run malicious SQL code. In this example, it would delete the Books table.
+The "availability" field has, initially, a valid value, however with the use of the escape character " ' ", it can be manipulated to run malicious SQL code. In this example, it would delete the Books table. Sanitisation of the data would remove these unwanted characters before the request reaches the server.
 
 Data that is contained in the clients request should be mapped to an object that exists within the backend of the API. This allows for a safe and secure conversion of data for the server to deal with, in addition to sending back a bad request Status Code if a field does not match.
 
@@ -619,7 +614,7 @@ An API is more than just the resources it exposes and the operations it can exec
 
 These are all the things that make up the API itself, and it is crucial for us, as developers, to address the potential issues that can come with excessive resource consumption and the over-exposure of endpoints. We want to ensure that our endpoints are meaningful and provide full context, whilst also limiting potential bad clients interactions with the client through safety checks and authentication.
 
-### What Chatty APIs? 
+### What are Chatty APIs? 
 
 Chatty APIs are APIs which expose a large number of small resources, requiring the client to make multiple requests to get all the data they need. We want to avoid situations these situations, ensuring that the system is not slowed down by numerous I/O operations.
 
