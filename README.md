@@ -12,9 +12,6 @@ My guideline differs from other best practice guides, primarily from the fact th
 - In contract to other guidelines that often focus on specific technologies from their parent company, such Google Clouds REST APIs or Microsoft’s proprietary technologies, this guide advocates for a broader, technology and language-agnostic approach. The proposed set of standards encompass identified common issues, risks and standards that follow the lifecycle of REST APIs.
 
 
-- I used Thematic Analysis on a host of research, gathering best practices and standards and identifying the common themes within them to ensure that my chosen topics were relevant and common enough that most viewers on this guide would appear reasonable.
-
-
 - Establishing these standards required a Thematic Analysis to be done on the range of research material gathered from my Literature Review. The topics covered in this guide stemmed from the distilled best practices and standards by identifying the recurring themes from all my research.
 
 
