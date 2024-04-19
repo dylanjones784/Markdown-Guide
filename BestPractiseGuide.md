@@ -35,11 +35,11 @@ Which would return a suitable content type back to the user representing the dat
 }
 ```
 
-- RESTful API Client-Server communications are classed as *stateless*. Each request is treated as independent to any other, and it must contain the entirety of the information required for the request to be processed. There are no client sessions, and the server will never rely on previous requests from clients. Having each request being atomic in nature allows for any server can handle any request as there are no session-related dependencies, as well as making the API less complex.
+- RESTful API Client-Server communications are classed as *stateless*. Each request is treated as independent to any other, and it must contain the entirety of the information required for the request to be processed. There are no client sessions, and the server will never rely on previous requests from clients. Having each request being atomic in nature allows for any server to handle any request as there are no session-related dependencies, as well as making the API less complex.
 
 - Responses should be labeled for caching or not appropriately. If the response is cacheable, the client should then be able to reuse that response data later for a specific length of time.
 
-- RESTful APIs should have each component organized into layers to encourage modularity and a separation of concerns between each aspect of the API.
+- RESTful APIs should have each component organised into layers to encourage modularity and a separation of concerns between each aspect of the API.
 
 
 - Clients should be able to navigate throughout the API without prior knowledge of the applications endpoints, and that with a single URI the application should dynamically attach relevant resources via hyperlinks. This is called *Hypermedia as the Engine of Application State(HATEOAS).*
@@ -90,7 +90,7 @@ HTTP is an established set of standards that facilitates communication between c
 REST is not reliant upon any protocol, but we make use of the HTTP application protocols as it is the most popular platform for REST API implementation. 
 
 HTTP enables client applications to interact with your API seamlessly, and provide the protocols and standards for the: 
-- URIs (How the clients interact with resources).
+- URIs (how the clients interact with resources).
 - Requests.
 - Responses.
 
@@ -138,7 +138,7 @@ Content Types are the agreed upon format between a client and server on how data
 
 RESTful APIs should include a list of accepted media types, that can be requested by the client for them to understand what media types are supported by the resources.
 
-Requests that are received with a content type that is not supported by the API, or is invalid, it should be rejected from the system with 406 (“Not Acceptable”) or 415 (“Refusal to accept request”).
+Requests that are received with a content type that is not supported by the API, or is invalid, should be rejected from the system with 406 (“Not Acceptable”) or 415 (“Refusal to accept request”).
 
 Some of the more popular formats of content types that should be supported are “text/plain“, “application/xml“, “text/html“, “application/json“, “image/gif“, and “image/jpeg“. All of these are indicators of data that can be communicated with.
 
@@ -166,10 +166,10 @@ Will return the book with an ID of 24. This helps create a hierarchy of resource
 Principles to focus on when designing a resource-oriented API are:
 1. The expected resources the API can provide.
 2. The relationships between resources. 
-3. The schema of each resource (i.e, the fields each resource represents)
+3. The schema of each resource (i.e, the fields each resource represents).
 4. The HTTP operations that can be executed on each resource.  
 
-Developer's should initialize their design process by identifying the business entities and endpoints that will be exposed to the client prior to development. Having your design dependent on the resources you expect to expose allows for a simplistic interface that can adapt rapidly to evolving functionality.
+Developers should initialise their design process by identifying the business entities and endpoints that will be exposed to the client prior to development. Having your design dependent on the resources you expect to expose allows for a simplistic interface that can adapt rapidly to evolving functionality.
 
 For example, in a bookkeeping system, the main entities that may be exposed could be Authors, Books and Orders. 
 
@@ -180,7 +180,9 @@ To create a new Book, a HTTP POST request that contains the book information wou
 | [https://bpg-library.com/books](https://bpg-library.com/books)         | Good        |
 | [https://bpg-library.com/create-book](https://bpg-library.com/create-book) | Avoid    |
 
-It is important to note that a resource doesn’t have to be a single piece of data, for example the book resource might be comprised of multiple tables from a database, but the client would only see the returned object as a single entity. Developers should not, when designing their API, mimic their database relationships for it is the purpose of REST to model the entities and operations that the application can perform on those entities. The inner workings of the system should not be exposed to clients.
+It is important to note that a resource doesn’t have to be a single piece of data. For example, the book resource might be comprised of multiple tables from a database, but the client would only see the returned object as a single entity. 
+
+Developers should not, when designing their API, mimic their database relationships for it is the purpose of REST to model the entities and operations that the application can perform on those entities. The inner workings of the system should not be exposed to clients.
 
 
 ## Resource Hierarchy
@@ -239,9 +241,7 @@ The returning body would like the example below.
 
 ```
 
- 
-In the scenario used for this guide, the main API service 
-The main API service is “bpg-library.com” that features two collection URIs, books and members. /books is the path to the book collection, and /books/10 would retrieve the book with an ID of 10. A RESTful API should also support parametrized URI paths, such as the books//{id} path and should behave similar to a network file path. Having the resources set in a hierarchical nature leads to a logical and easily understandable naming convention. 
+The main API service is “bpg-library.com” and features two collection URIs, books and members. /books is the path to the book collection, and /books/10 would retrieve the book with an ID of 10. A RESTful API should also support parametrized URI paths, such as the books//{id} path and should behave similar to a network file path. Having the resources set in a hierarchical nature leads to a logical and easily understandable naming convention. 
 
 
 
@@ -305,13 +305,13 @@ Devlopers should use the [RFC8288](https://www.rfc-editor.org/rfc/rfc8288) stand
 2. Link Relation – The relation between the source and the target resource.
 3. Attribute Type – HTTP method.
 
-Access Control with HATEOAS should be considered and should be main factor for developers to consider when de-coupling the admin and client server interactions from another. It may not be relevant to provide HATEOAS references for every request, whether that be over-engineering for the problem or due to security concerns. 
+Access Control with HATEOAS should be considered and should be the main factor for developers to consider when de-coupling the admin and client server interactions from another. It may not be relevant to provide HATEOAS references for every request, whether that be over-engineering for the problem or due to security concerns. 
 
 The hypermedia links may change as the resource state is altered, i.e there is data deleted or updated,  and this is what it means by being the "engine of application state".
 
 As we provide the hypermedia for related content in a request, it is recommended that we do a list of things to secure and limit access to higher level data access. HATEOAS should not be used for Admin services, nor should hypermedia links expose more of the system than necessary.
 
-It should be noted that many scenarios may not allow for this level of discoverability, perhaps due to company policy or data security. If that is the case, HATEOAS is not necessarily needed and a RESTful API that reaches Level 2 in the Richardson Maturity Model is still a solid service
+It should be noted that many scenarios may not allow for this level of discoverability, perhaps due to company policy or data security. If that is the case, HATEOAS is not necessarily needed and a RESTful API that reaches Level 2 in the Richardson Maturity Model is still a solid service.
 
 
 
@@ -325,9 +325,9 @@ This section of the guide focuses on the collected best practices and patterns f
 ## Access Control and Security
 
 An integral aspect of RESTful APIs is the concept of a layered system architecture, where each component of the API cannot see beyond its own layer. Each layer may have its own purpose but will all work together to fulfil the client’s request.  Developers should split their API into four distinct layers, examples of which can be found below.
--	Presentation Layer 
--	Logic Layer
--	Data Layer
+-	Presentation 
+-	Logic 
+-	Data 
 
 ### Why have three layers?
 
@@ -371,7 +371,7 @@ The "availability" field has, initially, a valid value, however with the use of 
 
 Data that is contained in the clients request should be mapped to an object that exists within the backend of the API. This allows for a safe and secure conversion of data for the server to deal with, in addition to sending back a bad request Status Code if a field does not match.
 
-Avoid using hardcoded request.getParameters to place data into queries for insertion into a database. One way of doin this is to map data to an identical model of the object so that another layer of validation is ensured. 
+Avoid using hardcoded request.getParameters to place data into queries for insertion into a database. One way of doing this is to map data to an identical model of the object so that another layer of validation is ensured. 
 
 For example, the Book class is set out as such in this examples C#.
 ```code
@@ -385,7 +385,7 @@ public class Book
 }
 ```
 
-Everytime a Book object is received in a request, the request body parameters that contains the JSON should have each individual value assigned to a new instance of the Book class. This allows for a clear and concise way of handling incoming data, as well as being heavily reusable.
+Everytime a Book object is received in a request, the request body parameters that contains the JSON should each have individual value assigned to a new instance of the Book class. This allows for a clear and concise way of handling incoming data, as well as being heavily reusable.
 
 # Configuring Access Control
 Broken or misconfigured access control on APIs were in the top 6 of both the OWASP Web API & the API Security Risks in 2021 and 2023 respectively. The root causes of these issues stemmed from:
@@ -443,7 +443,7 @@ Scenario #2: A cinema chain allows group booking discounts and has a maximum of 
 
 The main methods that help prevent an abuse of insecure design practice are:
 
-- Clients should be locally authenticated on each request to minimise latency and reduce the coupling between services. 
+- Clients should be locally authenticated on each request to lower latency and reduce the coupling between services. 
 
 - Each Rest CALL is stateless and should check whether the caller is authorised to perform said actiod on that resource.
 
@@ -452,7 +452,7 @@ The main methods that help prevent an abuse of insecure design practice are:
 
 ---
 
-Endpoints that are exposed to handle object identifiers, such as any endpoint that receives and ID of an object and performs any actions on said object, should implement access and object-level authorisation checks. These should validate whether the user who is logged in has permissions to perform the action on the object. When this isn’t done, it typically leads to unauthorised information discloser and the potential modification and destruction of all data.
+Endpoints that are exposed to handle object identifiers, such as any endpoint that receives the ID of an object and performs any actions on said object, should implement access and object-level authorisation checks. These should validate whether the user who is logged in has permissions to perform the action on the object. When this isn’t done, it typically leads to unauthorised information discloser and the potential modification and destruction of all data.
 
 
 
@@ -469,7 +469,7 @@ Public REST APIs that have no access control run the major risk of having its re
 
 ### Whats a JWT?
 
-A JSON Web Token is data structure that contains a set of claims that are used for access control decisions. Cryptographic should be attached to the token so that its integrity is protected. The official standard for a JWT is the [RFC7519](https://www.rfc-editor.org/rfc/rfc7519) 
+A JSON Web Token is a data structure that contains a set of claims that are used for access control decisions. Cryptographic should be attached to the token so that its integrity is protected. The official standard for a JWT is the [RFC7519](https://www.rfc-editor.org/rfc/rfc7519) 
 
 Developers could use Message Authentication Code to protect the integrity of the token, however if it is used then it should be kept in mind that any service that validate the JWTs can also be used to create new ones with the same key, meaning that all services that use the same key must trust each other mutually. Consequently, if one service is comprised, the rest are.
 
@@ -585,7 +585,7 @@ This decouples the long-running process from the initial request and allows clie
 ## Ensuring Stateless Requests
 Stateless Requests are when each request must contain all the information required to complete that request, each request is isolated from another and the server will not retain any context between consecutive requests. 
 
-This means that each request will contain the all information necessary, and that the system shouldn’t have to search further than the requests body and header tags to authorise the action the client wants to perform.
+This means that each request will contain all the information necessary, and that the system shouldn’t have to search further than the requests body and header tags to authorise the action the client wants to perform.
 
 A request which does not contain this information should be responded with a 401-Unauthorised, including a message on what the user requires to be authenticated to access the resource.
 
@@ -616,7 +616,7 @@ These are all the things that make up the API itself, and it is crucial for us, 
 
 ### What are Chatty APIs? 
 
-Chatty APIs are APIs which expose a large number of small resources, requiring the client to make multiple requests to get all the data they need. We want to avoid situations these situations, ensuring that the system is not slowed down by numerous I/O operations.
+Chatty APIs are APIs which expose a large number of small resources, requiring the client to make multiple requests to get all the data they need. We want to avoid these situations, ensuring that the system is not slowed down by numerous I/O operations.
 
 We can identify a "chatty" API by the following example:
 
@@ -731,7 +731,7 @@ The last thing a developer wants is to find out way after the fact that their se
 
 An API which does not correctly handle exceptions or log their errors may contain these risks: 
 -	Failure to audit high-value events, such as logins, failed attempts and large transactions.
--	Warnings and errors generate unclear log messages, increasing the difficulty of identifying the root issue
+-	Warnings and errors generate unclear log messages, increasing the difficulty of identifying the root issue.
 
 - Logs stored locally, following no format.
 
@@ -740,7 +740,7 @@ An API which does not correctly handle exceptions or log their errors may contai
 
 Developers should follow these patterns when developing their API's exception and error handling:
 
--All logins, access control and server-side input validations to be logged with sufficient user context (i.e., an identifiable user detail) so that suspicious or malicious accounts can be identified and analysed forensically.
+- All logins, access control and server-side input validations to be logged with sufficient user context (i.e., an identifiable user detail) so that suspicious or malicious accounts can be identified and analysed forensically.
 -	Ensure that all error logs that are generated are in a consistent format.
 
 -	An audit trail of a user’s interactions and commands they have executed within the system should be kept and only allowed access by admin users.
@@ -758,7 +758,7 @@ Developers should not, under any circumstance, alert the user by making the logg
 ## Filtering and Paginating Data
 Resource collection requests can be exhaustive on the API, and if not handled correctly can cause resource starvation for other clients. Imagine having an API that contains a large set of data on books, and every bookstore that uses that API requires that collection to perform their day-to-day business. 
 
-Without some sort of filtering technique in place, the API requires clients to handle large collections of data they may not need all and filter it for the data they require.
+Without some sort of filtering technique in place, the API would require clients to manage their own filter and query system on the returned large collection of data.
 
 We don’t want the server to be negatively affected by network traffic and increased latency. It is in our best interest to enable clients to filter down responses into smaller chunks.
 
@@ -1062,7 +1062,7 @@ Now, lets say the client wants to call the API version 2.0, as that contains mor
 
 Again, the object schema must match what is in the version being set **UNLESS** it is a conditional value.
 
-All clients are required to include that custom header with their targeted API version. If it is omitted, or left out, a *Default* Version can be used, which is essentially just 
+All clients are required to include that custom header with their targeted API version. If it is omitted, or left out, a *Default* Version can be used. This is when the API service will apply a default version for all incoming requests.
 
 If the API version is not included, a Status Code of 400-Bad Request and an relevant message describing the issue must be returned to the client. 
 
@@ -1085,7 +1085,7 @@ If the functionality is still available, but is going to be deprecated in a week
 ```text
 <description of Service> will retire on <date> (url)
 ```
-(url) is optional and can be used to show more information on the matter for the client.
+The (url) is optional and can be used to show more information on the matter for the client.
 
 If the functionality has fully deprecated and is no longer used by the API, the API must return a response that contains a 410-Gone Status Code.
 
