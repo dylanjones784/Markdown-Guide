@@ -289,17 +289,9 @@ Client data should be sanitised to protect against SQL Injections. Sanitisation 
 Deleted data should be retained for X amount of days before being erased completely. Clients should have the ability to rollback their changes so that data can be recovered promptly.
 
 
-**Validating against Cross site request forger Rate Limiting - Headers, Services implemented?**
-
 
 ## Common API Implementation Practices
 Requests can sometimes take longer than expected to process, in which case the client should have a 202-Accepted Status code returned to show that the request has been accepted, as well as a URI that can be used to show the progress. This is referred to as an Long Running Operation(LRO)
-
-
-Do not let your API be chatty. When designing your API, keep in mind the 
-workflow? Client journey? REsource Consumption
-
-
 
 ## Exception handling and Error Logging
 Error logs should be kept and maintained regularly. They should be in a consistent format, and it should store any malicious
@@ -369,9 +361,6 @@ The API should support the Cache Control headers of:
 ### ETags
 
 An ETag, or Entity Tag, is a digital fingerprint of a resource. Returning an ETag value with a GET or HEAD will allow caching of unchanged resources. 
-
-
-
 
 
 
